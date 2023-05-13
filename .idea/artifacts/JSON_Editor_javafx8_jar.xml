@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="JSON-Editor-javafx8:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/JSON_Editor_javafx8_jar</output-path>
+    <root id="archive" name="JSON-Editor-javafx8.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="JSON-Editor-javafx8" />
+    </root>
+  </artifact>
+</component>

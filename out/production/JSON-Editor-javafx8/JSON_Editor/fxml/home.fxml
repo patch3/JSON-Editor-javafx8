@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="scene1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/8.0.171" fx:controller="JSON_Editor.controler.Home">
+    <children>
+        <Pane layoutX="-4.0" layoutY="-6.0" prefHeight="40.0" prefWidth="600.0" style="-fx-background-color: #0F5FFF;"
+              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <MenuButton layoutX="6.0" layoutY="1.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="72.0"
+                            styleClass="MenuButton" text="File" textFill="WHITE">
+                    <items>
+                        <MenuItem fx:id="createLocal" mnemonicParsing="false" text="Create"/>
+                        <MenuItem fx:id="openLocal" mnemonicParsing="false" text="Open"/>
+                    </items>
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </MenuButton>
+                <MenuButton layoutX="75.0" layoutY="1.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="105.0"
+                            styleClass="MenuButton" text="Connect" textFill="WHITE">
+                    <items>
+                        <MenuItem fx:id="configureConn" mnemonicParsing="false" text="Configure"/>
+                        <MenuItem mnemonicParsing="false" text="Action 2"/>
+                    </items>
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </MenuButton>
+                <MenuButton layoutX="177.0" layoutY="1.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="98.0"
+                            styleClass="MenuButton" text="help" textFill="WHITE">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Action 1"/>
+                        <MenuItem mnemonicParsing="false" text="Action 2"/>
+                    </items>
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </MenuButton>
+            </children>
+        </Pane>
+        <TextArea fx:id="textArea" layoutX="25.0" layoutY="53.0" prefHeight="324.0" prefWidth="346.0"
+                  AnchorPane.bottomAnchor="23.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="229.0"
+                  AnchorPane.topAnchor="53.0"/>
+    </children>
+</AnchorPane>

@@ -2,8 +2,7 @@ package JSON_Editor.controler;
 
 
 import JSON_Editor.Main;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import JSON_Editor.util.json.Json;
 import com.sun.istack.internal.Nullable;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -31,8 +30,7 @@ public class Home {
     private TextArea textArea;
     @Nullable
     private File workFile;
-    private static final Gson gson = new Gson();
-    private JsonObject jsonObject;
+    //private static final Json gson = new Json();
 
 
     public void initialize() {
@@ -72,20 +70,9 @@ public class Home {
         workFile = chooser.showOpenDialog(createLocal.getParentPopup()); //Вызываем диалоговое окно
         if (workFile == null) return;
 
-        try {
-            JsonObject jsonObject = gson.fromJson(new String(Files.readAllBytes(workFile.toPath())), JsonObject.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        /*try (FileReader reader = new FileReader(workFile)) {
-            textArea.clear();
-            while (reader.ready()) {
-                textArea.appendText(String.valueOf((char) reader.read()));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+
+
     }
 
     private void eventClickConfigureConn(Event event) {

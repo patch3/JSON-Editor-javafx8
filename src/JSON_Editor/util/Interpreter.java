@@ -7,14 +7,14 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 public class Interpreter {
-    public static final char[] SKIP_CHARS = {' ', '\n', '\t', '\r'};
+    public static final char[] SKIP_CHARS = {'\t', '\n', '\r', ' '};
 
+    // пропускать не нужные символы
     public static int skipChar(char[] chStr, int i) {
         while (i < chStr.length) {
             // выйти из цыкла если встретился символ отличный от пропускаемого
-            if (0 > Arrays.binarySearch(SKIP_CHARS, chStr[i])) {
+            if (Arrays.binarySearch(SKIP_CHARS, chStr[i]) < 0)
                 break;
-            }
             ++i;
         }
         return i;

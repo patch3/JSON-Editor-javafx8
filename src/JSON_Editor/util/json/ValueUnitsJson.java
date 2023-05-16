@@ -6,6 +6,7 @@ import jdk.nashorn.internal.runtime.regexp.joni.exception.SyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static JSON_Editor.util.json.ArrayUnitJson.START_VALUE_CHAR;
 
@@ -27,6 +28,19 @@ public class ValueUnitsJson {
             default:
                 throw new JsonException("UNEXPECTED_OPEN_CHAR", i);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ValueUnitsJson that = (ValueUnitsJson) o;
+        return Objects.equals(value, that.value) && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, type);
     }
 
     public int unitsInterpreter(char[] chStr, int i) {
@@ -62,7 +76,9 @@ public class ValueUnitsJson {
                     if (postCheckName) {
                         postCheckName = false;
                         postCheckValue = true;
-                        i = unit.valueInterpreter(chStr, i);
+                        i = unit.valueInterpreter(chStr, ++i);
+                        units.add(unit);
+                        unit = new UnitJson();
                         break;
                     }
                 case ',':
@@ -80,7 +96,7 @@ public class ValueUnitsJson {
                         break;
                     }
                 default:
-                    if (0 < (temp = Interpreter.skipChar(chStr, i))) {
+                    if (0 < (temp = (Interpreter.skipChar(chStr, i) - 1))) {
                         i = temp;
                         break;
                     } else

@@ -4,6 +4,7 @@ import JSON_Editor.util.Interpreter;
 import com.sun.istack.internal.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ArrayUnitJson {
 
@@ -21,27 +22,18 @@ public class ArrayUnitJson {
         this.value = value;
     }
 
-    public String getStringValue() {
-        if (this.typeValue != TypeValue.STRING) {
-            throw new JsonException("Value is not of type STRING");
-        }
-        return String.format("\"%s\"", this.value);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ArrayUnitJson that = (ArrayUnitJson) o;
+        return Objects.equals(value, that.value) && typeValue == that.typeValue;
     }
 
-    public String getNumStringValue() {
-        if (this.typeValue != TypeValue.NUMBER) {
-            throw new JsonException("Value is not of type NUMBER");
-        }
-        return (String) this.value;
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, typeValue);
     }
-
-    public List<UnitJson> getUnitList() {
-        if (this.typeValue != TypeValue.UNITS_ARRAY) {
-            throw new JsonException("Value is not of type UNITS_ARRAY");
-        }
-        return (List<UnitJson>) this.value;
-    }
-
 
     public int valueInterpreter(char[] chStr, int i) {
         i = Interpreter.skipChar(chStr, i);
@@ -63,7 +55,7 @@ public class ArrayUnitJson {
                 if (Character.isDigit(ch) || ch == '-') {
                     this.value = Interpreter.numberStr(chStr, i);
                     this.typeValue = TypeValue.NUMBER;
-                    return ((String) this.value).length() + i;
+                    return ((String) this.value).length() + i - 1;
                 }
                 throw new JsonException("EXPECTED_VALUE", i);
         }
@@ -95,6 +87,28 @@ public class ArrayUnitJson {
         this.typeValue = TypeValue.NUMBER;
         return ((String)this.value).length() + i;
     }*/
+
+    public String getStringValue() {
+        if (this.typeValue != TypeValue.STRING) {
+            throw new JsonException("Value is not of type STRING");
+        }
+        return String.format("\"%s\"", this.value);
+    }
+
+    public String getNumStringValue() {
+        if (this.typeValue != TypeValue.NUMBER) {
+            throw new JsonException("Value is not of type NUMBER");
+        }
+        return (String) this.value;
+    }
+
+    public List<UnitJson> getUnitList() {
+        if (this.typeValue != TypeValue.UNITS_ARRAY) {
+            throw new JsonException("Value is not of type UNITS_ARRAY");
+        }
+        return (List<UnitJson>) this.value;
+    }
+
 
     public Object getValue() {
         return value;

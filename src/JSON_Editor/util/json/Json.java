@@ -1,101 +1,57 @@
 package JSON_Editor.util.json;
 
-
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import JSON_Editor.util.Interpreter;
 import com.sun.istack.internal.Nullable;
-import jdk.nashorn.internal.runtime.regexp.joni.exception.SyntaxException;
 
-import java.util.ArrayList;
+import java.io.File;
 import java.util.List;
 
 public class Json {
     @Nullable
-    public List<UnitJson> units;
+    public ValueUnitsJson units;
 
-    public Json(String str) {
-        units = Interpreter(str.toCharArray());
+    public Json(File fileJson) throws IOException  {
+        this(
+            new String(
+                Files.readAllBytes(
+                        Paths.get(
+                                fileJson.getAbsolutePath()
+        ))));
     }
 
-    public static List<UnitJson> Interpreter(char[] chStr) {
-        if (chStr[0] != '{') {
-            throw new SyntaxException("Interpretation of Unit JSON must start with character '{'");
-        }
-        int i = 1;
-        boolean startCheckUnit = true;
-        boolean postCheckName = false;
-        boolean postCheckValue = false;
-        boolean postCheckComma = false;
-        boolean CheckValue = false;
+    public Json(String str) {
+        char[] chStr = str.toCharArray();
+        units = new ValueUnitsJson(
+                str.toCharArray(),
+                Interpreter.skipChar(chStr, 0)
+        );
+    }
 
-        List<UnitJson> units = new ArrayList<>();
+    public ValueUnitsJson getUnits() {
+        return this.units;
+    }
 
-        UnitJson unit = new UnitJson();
+    public void setUnits(ValueUnitsJson units) {
+        this.units = units;
+    }
 
-        while (i < chStr.length) {
-            char ch = chStr[i];
-            switch (ch) {
-                case '{':
-                case '[':
-                    if (postCheckName) {
-                        postCheckName = false;
-                        postCheckValue = true;
-                        i = unit.unitInterpreter(chStr, i);
-                        //++i;
-                        break;
-                    } else throw new SyntaxException("Opening symbols were not expected at index '" + i + "'");
-                case '}':
-                case ']':
-                    if (postCheckComma || postCheckValue)
-                        return units;
-                    else if (startCheckUnit) {
-                        return null;
-                    } else throw new JsonException("Closing character was not expected at index '" + i + "'");
-                case ':':
-                    if (postCheckName) {
-                        postCheckName = false;
-                        CheckValue = true;
-                        break;
-                    } else throw new SyntaxException("Missing character ':' at index '" + i + "'");
-                case ',':
-                    if (postCheckValue) {
-                        postCheckValue = false;
-                        postCheckComma = true;
-                        break;
-                    } else throw new SyntaxException("Missing character ',' at index '" + i + "'");
-                case '"':
-                    if (startCheckUnit) {
-                        startCheckUnit = false;
-                        postCheckName = true;
-                        i = unit.nameInterpreter(chStr, i);
-                        //++i;
-                        break;
-                    } else if (postCheckComma) {
-                        postCheckComma = false;
-                        postCheckName = true;
-                        i = unit.nameInterpreter(chStr, i);
-                        //++i;
-                        break;
-                    } else if (CheckValue) {
-                        CheckValue = false;
-                        postCheckValue = true;
-                        i = unit.valueInterpreter(chStr, i);
-                        units.add(unit);
-                        unit = new UnitJson();
-                        //++i;
-                        break;
-                    } else throw new SyntaxException("Not expected '\"' of index " + i);
-                default:
-                    if (Character.isDigit(ch) || ch == '-' && CheckValue) {
-                        CheckValue = false;
-                        postCheckValue = true;
-                        i = unit.valueInterpreter(chStr, i);
-                        units.add(unit);
-                        unit = new UnitJson();
-                        //++i;
-                        break;
-                    }
-            }
-            ++i;
-        }
-        return units;
+    public Object getValue() {
+        return units.getValue();
+    }
+
+    public ValueUnitsJson.TypeValue getTypeValue() {
+        return units.getType();
+    }
+
+    public List<UnitJson> getUnitsValue() {
+        return units.getUnitsValue();
+    }
+
+    public List<ArrayUnitJson> getArrayValue() {
+        return units.getArrayValue();
     }
 }

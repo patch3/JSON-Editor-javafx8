@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="javafx" name="JSON-Editor-javafx8">
+  <artifact type="javafx" build-on-make="true" name="JSON-Editor-javafx8">
     <output-path>$PROJECT_DIR$/out/artifacts/JSON_Editor_javafx8</output-path>
     <properties id="javafx-properties">
       <options>
@@ -17,6 +17,7 @@
     <root id="root">
       <element id="archive" name="JSON_Editor_javafx8.jar">
         <element id="module-output" name="JSON-Editor-javafx8" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/lib/gson/gson-2.10.1.jar" path-in-jar="/" />
       </element>
     </root>
   </artifact>

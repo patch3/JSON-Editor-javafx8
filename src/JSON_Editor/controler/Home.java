@@ -2,6 +2,8 @@ package JSON_Editor.controler;
 
 
 import JSON_Editor.Main;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.sun.istack.internal.Nullable;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -15,9 +17,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Objects;
 
 public class Home {
@@ -29,12 +31,16 @@ public class Home {
     private TextArea textArea;
     @Nullable
     private File workFile;
+    private static final Gson gson = new Gson();
+    private JsonObject jsonObject;
 
 
     public void initialize() {
         createLocal.setOnAction(this::eventClickCreateLocal);
         openLocal.setOnAction(this::eventClickOpen);
         configureConn.setOnAction(this::eventClickConfigureConn);
+
+
     }
 
     private void eventClickCreateLocal(Event event) {
@@ -65,14 +71,21 @@ public class Home {
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("json", "*.json")); //Допустимые расширения файла
         workFile = chooser.showOpenDialog(createLocal.getParentPopup()); //Вызываем диалоговое окно
         if (workFile == null) return;
-        try (FileReader reader = new FileReader(workFile)) {
+
+        try {
+            JsonObject jsonObject = gson.fromJson(new String(Files.readAllBytes(workFile.toPath())), JsonObject.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*try (FileReader reader = new FileReader(workFile)) {
             textArea.clear();
             while (reader.ready()) {
                 textArea.appendText(String.valueOf((char) reader.read()));
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     private void eventClickConfigureConn(Event event) {

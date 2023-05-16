@@ -1,4 +1,8 @@
 {
-  "name": "Test",
-   "tester": 123
+  "name": "resurs",
+  "version": 123,
+  "dependencies": {
+    "uuid": "9.0.0",
+    "fs-extra": 11
+  }
 }

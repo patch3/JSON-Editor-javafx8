@@ -30,6 +30,11 @@ public class ValueUnitsJson {
         }
     }
 
+    public ValueUnitsJson(Object value, TypeValue type) {
+        this.value = value;
+        this.type = type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -44,12 +49,12 @@ public class ValueUnitsJson {
     }
 
     public int unitsInterpreter(char[] chStr, int i) {
-        if (chStr[0] != '{') {
+        if (chStr[i] != '{') {
             throw new SyntaxException("Interpretation of Unit JSON must start with character '{'");
         }
         ++i;
         boolean start = true;
-        boolean postCheckName = true;
+        boolean postCheckName = false;
         boolean postCheckValue = false;
         boolean postCheckComma = false;
 
@@ -63,12 +68,12 @@ public class ValueUnitsJson {
 
             switch (ch) {
                 case '}':
-                    if (start) {
-                        this.value = null;
+                    if (postCheckValue) {
+                        this.value = units;
                         this.type = TypeValue.UNITS;
                         return i;
-                    } else if (postCheckValue) {
-                        this.value = units;
+                    } else if (start) {
+                        this.value = null;
                         this.type = TypeValue.UNITS;
                         return i;
                     }
@@ -78,13 +83,13 @@ public class ValueUnitsJson {
                         postCheckValue = true;
                         i = unit.valueInterpreter(chStr, ++i);
                         units.add(unit);
-                        unit = new UnitJson();
                         break;
                     }
                 case ',':
                     if (postCheckValue) {
                         postCheckValue = false;
                         postCheckComma = true;
+                        unit = new UnitJson();
                         break;
                     }
                 case '"':
@@ -108,7 +113,7 @@ public class ValueUnitsJson {
     }
 
     public int arrayInterpreter(char[] chStr, int i) {
-        if (chStr[0] != '[') {
+        if (chStr[i] != '[') {
             throw new JsonException("ARRAY_EXPECTED", i);
         }
         ++i;
@@ -129,7 +134,7 @@ public class ValueUnitsJson {
                     if (postCheckValue) {
                         checkValue = true;
                         postCheckValue = false;
-                        units.add(unit);
+                        unit = new ArrayUnitJson();
                     }
                     break;
                 case ']':
@@ -149,8 +154,9 @@ public class ValueUnitsJson {
                         checkValue = false;
                         postCheckValue = true;
                         i = unit.valueInterpreter(chStr, i);
-                    } else if (i < (temp = Interpreter.skipChar(chStr, i))) {
-                        i = temp;
+                        units.add(unit);
+                    } else if (0 < (temp = (Interpreter.skipChar(chStr, i) - 1 - i))) {
+                        i += temp;
                     } else throw new JsonException("UNDEFINED_ENTRY", i);
                     break;
             }
@@ -158,6 +164,7 @@ public class ValueUnitsJson {
         }
         throw new JsonException("UNEXPECTED_ENDING");
     }
+
 
     public Object getValue() {
         return value;
@@ -184,11 +191,11 @@ public class ValueUnitsJson {
         this.type = type;
     }
 
-    enum TypeValue {
+    public enum TypeValue {
         UNITS,
-        ARRAY,
+        ARRAY/*,
         NULL_UNITS,
-        NULL_ARRAY
+        NULL_ARRAY*/
     }
 
 }

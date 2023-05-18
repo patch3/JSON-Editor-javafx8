@@ -1,49 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="scene1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/8.0.171" fx:controller="JSON_Editor.controler.Home">
+
+<AnchorPane fx:id="scene1" cacheShape="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #fff;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JSON_Editor.controler.Home">
     <children>
-        <Pane layoutX="-4.0" layoutY="-6.0" prefHeight="40.0" prefWidth="600.0" style="-fx-background-color: #0F5FFF;"
-              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <Pane fx:id="panePlacement" layoutX="14.0" layoutY="54.0" prefHeight="337.0" prefWidth="390.0" style="-fx-background-color: #243b69; -fx-background-radius: 16px;" AnchorPane.bottomAnchor="9.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="196.0" AnchorPane.topAnchor="54.0" />
+      <Pane fx:id="paneСhange" layoutX="416.0" layoutY="43.0" prefHeight="357.0" prefWidth="187.0" style="-fx-border-width: 0 0 0 5; -fx-border-color: #008df4;" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="43.0" />
+        <Pane layoutX="-4.0" layoutY="-6.0" prefHeight="44.0" prefWidth="600.0" style="-fx-background-color: #1c3974;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <MenuButton layoutX="6.0" layoutY="1.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="72.0"
-                            styleClass="MenuButton" text="File" textFill="WHITE">
+                <MenuButton layoutX="8.0" layoutY="4.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="72.0" styleClass="MenuButton" text="File" textFill="WHITE">
                     <items>
-                        <MenuItem fx:id="createLocal" mnemonicParsing="false" text="Create"/>
-                        <MenuItem fx:id="openLocal" mnemonicParsing="false" text="Open"/>
+                        <MenuItem fx:id="createLocal" mnemonicParsing="false" text="Create" />
+                        <MenuItem fx:id="openLocal" mnemonicParsing="false" text="Open" />
+                  <MenuItem fx:id="save" mnemonicParsing="false" text="Save" />
+                  <MenuItem fx:id="exit" mnemonicParsing="false" text="Exit" />
                     </items>
                     <font>
-                        <Font size="14.0"/>
+                        <Font size="14.0" />
                     </font>
                 </MenuButton>
-                <MenuButton layoutX="75.0" layoutY="1.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="105.0"
-                            styleClass="MenuButton" text="Connect" textFill="WHITE">
+                <MenuButton layoutX="77.0" layoutY="4.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="105.0" styleClass="MenuButton" text="Connect" textFill="WHITE">
                     <items>
-                        <MenuItem fx:id="configureConn" mnemonicParsing="false" text="Configure"/>
-                        <MenuItem mnemonicParsing="false" text="Action 2"/>
+                        <MenuItem fx:id="configureConn" mnemonicParsing="false" text="Configure" />
+                        <MenuItem mnemonicParsing="false" text="Action 2" />
                     </items>
                     <font>
-                        <Font size="14.0"/>
+                        <Font size="14.0" />
                     </font>
                 </MenuButton>
-                <MenuButton layoutX="177.0" layoutY="1.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="98.0"
-                            styleClass="MenuButton" text="help" textFill="WHITE">
+                <MenuButton layoutX="179.0" layoutY="4.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="98.0" styleClass="MenuButton" text="help" textFill="WHITE">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Action 1"/>
-                        <MenuItem mnemonicParsing="false" text="Action 2"/>
+                        <MenuItem mnemonicParsing="false" text="Action 1" />
+                        <MenuItem mnemonicParsing="false" text="Action 2" />
                     </items>
                     <font>
-                        <Font size="14.0"/>
+                        <Font size="14.0" />
                     </font>
                 </MenuButton>
+            <Label layoutX="452.0" layoutY="4.0" prefHeight="33.0" prefWidth="134.0" style="-fx-text-fill: #fff; -fx-text-alignment: center; -fx-content-display: center;" text="JSON Editor">
+               <font>
+                  <Font name="Verdana" size="20.0" />
+               </font>
+            </Label>
             </children>
         </Pane>
-        <TextArea fx:id="textArea" layoutX="25.0" layoutY="53.0" prefHeight="324.0" prefWidth="346.0"
-                  AnchorPane.bottomAnchor="23.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="229.0"
-                  AnchorPane.topAnchor="53.0"/>
     </children>
 </AnchorPane>

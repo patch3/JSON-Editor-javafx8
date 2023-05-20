@@ -13,9 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -37,9 +35,7 @@ public class Home {
     @FXML
     private TextArea textArea;
     @FXML
-    public Pane panePlacement;
-
-
+    public TreeView<String> treeView;
 
     public Json json;
 
@@ -51,9 +47,10 @@ public class Home {
 
 
     public void initialize() {
+        treeView.setShowRoot(false);
+
         createLocal.setOnAction(this::eventClickCreateLocal);
         openLocal.setOnAction(this::eventClickOpen);
-        configureConn.setOnAction(this::eventClickConfigureConn);
 
         
     }
@@ -74,8 +71,6 @@ public class Home {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
 
@@ -94,8 +89,6 @@ public class Home {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-
     }
 
     private void eventClickConfigureConn(Event event) {
@@ -116,7 +109,25 @@ public class Home {
 
 
     public void showJson(Json json) {
-        List<?> unitJson;
+        TreeItem<String> rootItem = new TreeItem<>("Multi-Dimensional Array");
+        rootItem.setExpanded(true);
+        if (json.getTypeValue() == ValueUnitsJson.TypeValue.ARRAY) {
+            List<ArrayUnitJson> unitJson = json.getArrayValue();
+        } else if (json.getTypeValue() == ValueUnitsJson.TypeValue.UNITS) {
+            List<UnitJson> unitJson = json.getUnitsValue();
+            int size = unitJson.size();
+            for (int i = 0; i < size; ++i) {
+                TreeItem<String> item = new TreeItem<>(unitJson.get(i).name);
+                rootItem.getChildren().add(item);
+
+            }
+        }
+         treeView.setRoot(rootItem);
+        //treeView.setShowRoot(false);
+    }
+
+
+                /*List<?> unitJson;
         if (json.getTypeValue() == ValueUnitsJson.TypeValue.ARRAY){
             unitJson = json.getArrayValue();
         } else if (json.getTypeValue() == ValueUnitsJson.TypeValue.UNITS) { 
@@ -127,8 +138,8 @@ public class Home {
                 bts.setText("");
                 panePlacement.getChildren().add(bts);
             }
-        }
+        }*/
 
         
-    }
+
 }

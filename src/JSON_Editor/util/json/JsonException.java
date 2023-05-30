@@ -1,4 +1,4 @@
-package JSON_Editor.util.json;
+package util.json;
 
 public class JsonException extends RuntimeException {
     public JsonException(String message) {

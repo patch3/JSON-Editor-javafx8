@@ -1,7 +1,5 @@
-package JSON_Editor;
-
-import JSON_Editor.config.FilesCfg;
 import JSON_Editor.manager.Dirs;
+import config.FilesCfg;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

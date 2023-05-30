@@ -1,11 +1,5 @@
-package JSON_Editor.controler;
+package controler;
 
-
-import JSON_Editor.Main;
-import JSON_Editor.util.json.Json;
-import JSON_Editor.util.json.ValueUnitsJson;
-import JSON_Editor.util.json.ArrayUnitJson;
-import JSON_Editor.util.json.UnitJson;
 
 import com.sun.istack.internal.Nullable;
 import javafx.event.Event;
@@ -13,18 +7,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.scene.layout.Pane;
+import jdk.jfr.internal.tool.Main;
+import util.json.Json;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Objects;
-import java.util.List;
 
 
 public class Home {
@@ -50,9 +45,9 @@ public class Home {
         treeView.setShowRoot(false);
 
         createLocal.setOnAction(this::eventClickCreateLocal);
-        openLocal.setOnAction(this::eventClickOpen);
+        //openLocal.setOnAction(this::eventClickOpen);
 
-        
+
     }
 
     private void eventClickCreateLocal(Event event) {
@@ -74,7 +69,7 @@ public class Home {
     }
 
 
-    private void eventClickOpen(Event event) {
+    /*private void eventClickOpen(Event event) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("");
         chooser.setInitialFileName("NewFile"); //Имя файла, которое по умолчанию устанавливается
@@ -89,7 +84,7 @@ public class Home {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
+    }*/
 
     private void eventClickConfigureConn(Event event) {
         Stage stage = new Stage();
@@ -108,12 +103,12 @@ public class Home {
     }
 
 
-    public void showJson(Json json) {
+    /*public void showJson(Json json) {
         TreeItem<String> rootItem = new TreeItem<>("Multi-Dimensional Array");
         rootItem.setExpanded(true);
-        if (json.getTypeValue() == ValueUnitsJson.TypeValue.ARRAY) {
+        if (json.getType() == TypeUnit.ARRAY_UNIT) {
             List<ArrayUnitJson> unitJson = json.getArrayValue();
-        } else if (json.getTypeValue() == ValueUnitsJson.TypeValue.UNITS) {
+        } else if (json.getType() == TypeUnit.UNIT) {
             List<UnitJson> unitJson = json.getUnitsValue();
             int size = unitJson.size();
             for (int i = 0; i < size; ++i) {
@@ -124,22 +119,17 @@ public class Home {
         }
          treeView.setRoot(rootItem);
         //treeView.setShowRoot(false);
-    }
+    }*/
 
-
-                /*List<?> unitJson;
-        if (json.getTypeValue() == ValueUnitsJson.TypeValue.ARRAY){
-            unitJson = json.getArrayValue();
-        } else if (json.getTypeValue() == ValueUnitsJson.TypeValue.UNITS) { 
-            unitJson = json.getUnitsValue();
-            int size = unitJson.size();
-            for (int i = 0; i < size; i++) {
-                Button bts = new Button();
-                bts.setText("");
-                panePlacement.getChildren().add(bts);
-            }
-        }*/
-
-        
+    /*private TreeItem<IUnitJson> createTreeItem(IUnitJson obj) {
+        TreeItem<IUnitJson> item = new TreeItem<>(obj);
+        List<IUnitJson> unitsList;
+        if (obj.get)
+        for (IUnitJson childObject : unitsList) {
+            TreeItem<IUnitJson> childItem = createTreeItem(childObject);
+            item.getChildren().add(childItem);
+        }
+        return item;
+    }*/
 
 }

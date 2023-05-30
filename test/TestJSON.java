@@ -1,16 +1,11 @@
-import JSON_Editor.util.json.ArrayUnitJson;
-import JSON_Editor.util.json.Json;
-import JSON_Editor.util.json.UnitJson;
-import JSON_Editor.util.json.ValueUnitsJson;
-import jdk.internal.org.objectweb.asm.tree.analysis.Value;
 import org.junit.jupiter.api.Test;
+import util.json.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Vector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -47,7 +42,7 @@ public class TestJSON {
                 "dependencies",
                 new ValueUnitsJson(
                         attachment,
-                        ValueUnitsJson.TypeValue.UNITS
+                        TypeUnit.UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY)
         );
 
@@ -99,7 +94,7 @@ public class TestJSON {
             new ArrayUnitJson(
                 new ValueUnitsJson(
                         attachment,
-                        ValueUnitsJson.TypeValue.ARRAY
+                        TypeUnit.ARRAY_UNIT
                 ), ArrayUnitJson.TypeValue.UNITS_ARRAY
         ));
 
@@ -129,13 +124,13 @@ public class TestJSON {
         attachment.add(new ArrayUnitJson(
                 new ValueUnitsJson(
                         null,
-                        ValueUnitsJson.TypeValue.UNITS
+                        TypeUnit.UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY
         ));
         attachment.add(new ArrayUnitJson(
                 new ValueUnitsJson(
                         null,
-                        ValueUnitsJson.TypeValue.ARRAY
+                        TypeUnit.ARRAY_UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY
         ));
 
@@ -144,7 +139,7 @@ public class TestJSON {
                 "dependencies",
                 new ValueUnitsJson(
                         attachment,
-                        ValueUnitsJson.TypeValue.ARRAY
+                        TypeUnit.ARRAY_UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY)
         );
 
@@ -155,10 +150,10 @@ public class TestJSON {
                                     .getResource("/resource/hard.json")
                     ).getPath()
             ));
-            if (actualJson.getTypeValue() == ValueUnitsJson.TypeValue.ARRAY) {
+            if (actualJson.getType() == TypeUnit.ARRAY_UNIT) {
                 List<UnitJson> actual = actualJson.getUnitsValue();
                 assertEquals(expected, actual);
-            }  else if (actualJson.getTypeValue() == ValueUnitsJson.TypeValue.UNITS) {
+            } else if (actualJson.getType() == TypeUnit.UNIT) {
                 List<UnitJson> actual = actualJson.getUnitsValue();
                 assertEquals(expected, actual);
             }
@@ -180,13 +175,13 @@ public class TestJSON {
         attachment.add(new ArrayUnitJson(
                 new ValueUnitsJson(
                         null,
-                        ValueUnitsJson.TypeValue.UNITS
+                        TypeUnit.UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY
         ));
         attachment.add(new ArrayUnitJson(
                 new ValueUnitsJson(
                         null,
-                        ValueUnitsJson.TypeValue.ARRAY
+                        TypeUnit.ARRAY_UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY
         ));
 
@@ -195,7 +190,7 @@ public class TestJSON {
                 "dependencies",
                 new ValueUnitsJson(
                         attachment,
-                        ValueUnitsJson.TypeValue.ARRAY
+                        TypeUnit.ARRAY_UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY)
         );
 
@@ -206,10 +201,10 @@ public class TestJSON {
                                     .getResource("/resource/hard.json")
                     ).getPath()
             ));
-            if (actualJson.getTypeValue() == ValueUnitsJson.TypeValue.ARRAY) {
+            if (actualJson.getType() == TypeUnit.ARRAY_UNIT) {
                 List<UnitJson> actual = actualJson.getUnitsValue();
                 assertEquals(expected, actual);
-            }  else if (actualJson.getTypeValue() == ValueUnitsJson.TypeValue.UNITS) {
+            } else if (actualJson.getType() == TypeUnit.UNIT) {
                 List<UnitJson> actual = actualJson.getUnitsValue();
                 assertEquals(expected, actual);
             }

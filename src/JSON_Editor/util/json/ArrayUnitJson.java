@@ -1,25 +1,39 @@
-package JSON_Editor.util.json;
+package util.json;
 
-import JSON_Editor.util.Interpreter;
 import com.sun.istack.internal.Nullable;
+import util.Interpreter;
 
 import java.util.List;
 import java.util.Objects;
 
-public class ArrayUnitJson {
-
+public class ArrayUnitJson implements IUnitJson {
     public static final char[] START_VALUE_CHAR = {'"', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '[', '{'};
-
+    private static int countId = 0;
+    public final TypeUnit TYPE_UNIT;
     @Nullable
     protected Object value;
     protected TypeValue typeValue;
+    protected int id;
+
 
     public ArrayUnitJson() {
+        this.id = countId++;
+        this.TYPE_UNIT = TypeUnit.ARRAY_UNIT;
     }
 
     public ArrayUnitJson(Object value, TypeValue typeValue) {
+        this();
         this.typeValue = typeValue;
         this.value = value;
+    }
+
+    public ArrayUnitJson(ArrayUnitJson obj) {
+        this(obj.value, obj.typeValue);
+    }
+
+    @Override
+    protected void finalize() {
+        --countId;
     }
 
     @Override
@@ -27,11 +41,15 @@ public class ArrayUnitJson {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ArrayUnitJson that = (ArrayUnitJson) o;
-        return Objects.equals(value, that.value) && typeValue == that.typeValue;
+        return id == that.id && Objects.equals(value, that.value) && typeValue == that.typeValue;
     }
 
     @Override
     public int hashCode() {
+        return Objects.hash(value, typeValue, id);
+    }
+
+    public int hashCodeContent() {
         return Objects.hash(value, typeValue);
     }
 
@@ -102,30 +120,41 @@ public class ArrayUnitJson {
         return (String) this.value;
     }
 
-    public List<UnitJson> getUnitList() {
+    public ValueUnitsJson getUnitList() {
         if (this.typeValue != TypeValue.UNITS_ARRAY) {
             throw new JsonException("Value is not of type UNITS_ARRAY");
         }
-        return (List<UnitJson>) this.value;
+        return (ValueUnitsJson) this.value;
     }
 
-
+    @Override
     public Object getValue() {
         return value;
     }
 
+    @Override
+    public void setValue(IUnitJson value) {
+
+    }
+
+    @Override
+    public List<IUnitJson> getValueList() {
+        return this.getUnitList().getValue();
+    }
+
+    @Override
+    public TypeUnit getTypeUnit() {
+        return this.TYPE_UNIT;
+    }
+
+    @Override
     public TypeValue getTypeValue() {
         return typeValue;
     }
 
+    @Override
     public void setValue(Object value, TypeValue typeValue) {
         this.typeValue = typeValue;
         this.value = value;
-    }
-
-    public enum TypeValue {
-        NUMBER,
-        STRING,
-        UNITS_ARRAY
     }
 }

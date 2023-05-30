@@ -1,57 +1,56 @@
-package JSON_Editor.util.json;
+package util.json;
+
+import util.Convert;
+import util.Interpreter;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import JSON_Editor.util.Interpreter;
-import com.sun.istack.internal.Nullable;
-
-import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Json {
-    @Nullable
-    public ValueUnitsJson units;
 
-    public Json(File fileJson) throws IOException  {
+public class Json extends ValueUnitsJson {
+
+    public Json(File fileJson) throws IOException {
         this(
-            new String(
-                Files.readAllBytes(
-                        Paths.get(
-                                fileJson.getAbsolutePath()
-        ))));
+                new String(
+                        Files.readAllBytes(
+                                Paths.get(
+                                        fileJson.getAbsolutePath()
+                                ))));
     }
 
     public Json(String str) {
-        char[] chStr = str.toCharArray();
-        units = new ValueUnitsJson(
-                str.toCharArray(),
-                Interpreter.skipChar(chStr, 0)
-        );
+        super(str.toCharArray(), Interpreter.skipChar(str.toCharArray(), 0));
     }
 
-    public ValueUnitsJson getUnits() {
-        return this.units;
+    public Json(List<? extends IUnitJson> obj, TypeUnit type) {
+        super(obj, type);
     }
 
-    public void setUnits(ValueUnitsJson units) {
-        this.units = units;
+
+    public int[] indexOf(ArrayUnitJson obj, TypeUnit type) {
+        return Convert.toIntArray(super.indexOf(obj, type, new ArrayList<Integer>()));
     }
 
-    public Object getValue() {
-        return units.getValue();
-    }
+    public IUnitJson get(int[] indexes) {
+        List<? extends IUnitJson> valueList = this.value;
+        IUnitJson element = null;
 
-    public ValueUnitsJson.TypeValue getTypeValue() {
-        return units.getType();
-    }
-
-    public List<UnitJson> getUnitsValue() {
-        return units.getUnitsValue();
-    }
-
-    public List<ArrayUnitJson> getArrayValue() {
-        return units.getArrayValue();
+        for (int i = 0; i < indexes.length; i++) {
+            int index = indexes[i];
+            int size = valueList.size();
+            if (index >= 0 && index < size) {
+                element = valueList.get(index);
+                if (element.getTypeValue() == IUnitJson.TypeValue.UNITS_ARRAY) {
+                    valueList = element.getValueList();
+                } else {
+                    valueList = null;
+                }
+            }
+        }
+        return element;
     }
 }

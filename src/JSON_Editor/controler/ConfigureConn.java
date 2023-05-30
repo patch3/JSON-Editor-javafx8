@@ -1,4 +1,4 @@
-package JSON_Editor.controler;
+package controler;
 
 import javafx.event.Event;
 import javafx.fxml.FXML;

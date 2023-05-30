@@ -1,18 +1,19 @@
-package JSON_Editor.util.json;
+package util.json;
 
-import JSON_Editor.util.Interpreter;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.SyntaxException;
+import util.Interpreter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-import static JSON_Editor.util.json.ArrayUnitJson.START_VALUE_CHAR;
+import static util.json.ArrayUnitJson.START_VALUE_CHAR;
 
 public class ValueUnitsJson {
-    private Object value;
-    private TypeValue type;
+    protected List<IUnitJson> value;
+    protected TypeUnit type;
 
     public ValueUnitsJson() {
     }
@@ -30,8 +31,14 @@ public class ValueUnitsJson {
         }
     }
 
-    public ValueUnitsJson(Object value, TypeValue type) {
-        this.value = value;
+    public ValueUnitsJson(List<? extends IUnitJson> value, TypeUnit type) {
+        if (value == null) {
+            this.value = null;
+        } else {
+            this.value = value.stream()
+                    .map(unit -> (IUnitJson) unit)
+                    .collect(Collectors.toList());
+        }
         this.type = type;
     }
 
@@ -69,12 +76,14 @@ public class ValueUnitsJson {
             switch (ch) {
                 case '}':
                     if (postCheckValue) {
-                        this.value = units;
-                        this.type = TypeValue.UNITS;
+                        this.value = units.stream()
+                                .map(unitJson -> (IUnitJson) unitJson)
+                                .collect(Collectors.toList());
+                        this.type = TypeUnit.UNIT;
                         return i;
                     } else if (start) {
                         this.value = null;
-                        this.type = TypeValue.UNITS;
+                        this.type = TypeUnit.UNIT;
                         return i;
                     }
                 case ':':
@@ -139,12 +148,14 @@ public class ValueUnitsJson {
                     break;
                 case ']':
                     if (postCheckValue) {
-                        this.value = units;
-                        this.type = TypeValue.ARRAY;
+                        this.value = units.stream()
+                                .map(unitJson -> (IUnitJson) unitJson)
+                                .collect(Collectors.toList());
+                        this.type = TypeUnit.ARRAY_UNIT;
                         return i;
                     } else if (start) {
                         this.value = null;
-                        this.type = TypeValue.ARRAY;
+                        this.type = TypeUnit.ARRAY_UNIT;
                         return i;
                     }
                     break;
@@ -165,37 +176,143 @@ public class ValueUnitsJson {
         throw new JsonException("UNEXPECTED_ENDING");
     }
 
+    public List<Integer> indexOf(Object value, TypeUnit type, List<Integer> result) {
+        List<? extends ArrayUnitJson> list;
+        int hash;
+        int size;
+        if (type == TypeUnit.UNIT && this.type == TypeUnit.UNIT) {
+            list = getUnitsValue();
+            if (list == null) return null;
+            hash = ((UnitJson) value).hashCode();
+            size = list.size();
+            for (int i = 0; i < size; ++i) {
+                UnitJson unit = (UnitJson) list.get(i);
+                if (unit.hashCode() == hash) {
+                    result.add(i);
+                    return result;
+                } else if (unit.getTypeValue() == ArrayUnitJson.TypeValue.UNITS_ARRAY) {
+                    List<Integer> tempResult = new ArrayList<Integer>(result);
+                    tempResult.add(i);
+                    tempResult = ((ValueUnitsJson) unit.getValue()).indexOf(value, type, tempResult);
+                    if (tempResult != null) {
+                        return tempResult;
+                    }
+                }
+            }
+        } else if (type == TypeUnit.ARRAY_UNIT && this.type == TypeUnit.ARRAY_UNIT) {
+            list = getArrayValue();
+            hash = ((ArrayUnitJson) value).hashCode();
+            if (list == null) return null;
+            size = list.size();
 
-    public Object getValue() {
+            for (int i = 0; i < size; ++i) {
+                ArrayUnitJson unit = (ArrayUnitJson) list.get(i);
+                if (unit.hashCode() == hash) {
+                    result.add(i);
+                    return result;
+                } else if (unit.getTypeValue() == ArrayUnitJson.TypeValue.UNITS_ARRAY) {
+                    List<Integer> tempResult = new ArrayList<>(result);
+                    tempResult.add(i);
+                    tempResult = ((ValueUnitsJson) unit.getValue()).indexOf(value, type, tempResult);
+                    if (tempResult != null) {
+                        return tempResult;
+                    }
+                }
+            }
+        } else if (type == TypeUnit.ARRAY_UNIT && this.type == TypeUnit.UNIT) {
+            list = getUnitsValue();
+            if (list == null) return null;
+            size = list.size();
+
+            for (int i = 0; i < size; ++i) {
+                UnitJson unit = (UnitJson) list.get(i);
+                if (unit.getTypeValue() == ArrayUnitJson.TypeValue.UNITS_ARRAY) {
+                    List<Integer> tempResult = new ArrayList<>(result);
+                    tempResult.add(i);
+                    tempResult = ((ValueUnitsJson) unit.getValue()).indexOf(value, type, tempResult);
+                    if (tempResult != null) {
+                        return tempResult;
+                    }
+                }
+            }
+        } else if (type == TypeUnit.UNIT && this.type == TypeUnit.ARRAY_UNIT) {
+            list = getArrayValue();
+            if (list == null) return null;
+            size = list.size();
+
+            for (int i = 0; i < size; ++i) {
+                ArrayUnitJson unit = (ArrayUnitJson) list.get(i);
+                if (unit.getTypeValue() == ArrayUnitJson.TypeValue.UNITS_ARRAY) {
+                    List<Integer> tempResult = new ArrayList<>(result);
+                    tempResult.add(i);
+                    tempResult = ((ValueUnitsJson) unit.getValue()).indexOf(value, type, tempResult);
+                    if (tempResult != null) {
+                        return tempResult;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
+    public List<IUnitJson> getValue() {
         return value;
     }
 
-    public TypeValue getType() {
-        return type;
+    public Object getValueIn(int i) {
+        return this.value.get(i);
     }
 
-    public List<UnitJson> getUnitsValue() {
-        if (this.type != TypeValue.UNITS)
-            throw new JsonException("WRONG_TYPE");
-        return (List<UnitJson>) this.value;
+    public UnitJson getUnitValueIn(int i) {
+        return getUnitsValue().get(i);
     }
+
+    public ArrayUnitJson getArrayValueIn(int i) {
+        return getArrayValue().get(i);
+    }
+
+
+    public TypeUnit getType() {
+        return this.type;
+    }
+
+    public TypeUnit getTypeUnit(int i) {
+        return ((IUnitJson) this.value.get(i)).getTypeUnit();
+    }
+
+    public ArrayUnitJson.TypeValue getTypeValue(int i) {
+        return ((IUnitJson) this.value.get(i)).getTypeValue();
+    }
+
+
+    // преобразование UnitJson
+    public List<UnitJson> getUnitsValue() {
+        if (this.type != TypeUnit.UNIT || this.value == null)
+            throw new JsonException("WRONG_TYPE");
+        return this.value.stream()
+                .map(unit -> (UnitJson) unit)
+                .collect(Collectors.toList());
+    }
+
 
     public List<ArrayUnitJson> getArrayValue() {
-        if (this.type != TypeValue.ARRAY)
+        if (this.type != TypeUnit.ARRAY_UNIT || this.value == null)
             throw new JsonException("WRONG_TYPE");
-        return (List<ArrayUnitJson>) this.value;
+        return this.value.stream()
+                .map(unit -> (ArrayUnitJson) unit)
+                .collect(Collectors.toList());
     }
 
-    public void setValue(Object value, TypeValue type) {
+
+    public void setValue(List<IUnitJson> value, TypeUnit type) {
         this.value = value;
         this.type = type;
     }
 
-    public enum TypeValue {
+    /*public enum TypeValue {
         UNITS,
-        ARRAY/*,
-        NULL_UNITS,
-        NULL_ARRAY*/
-    }
+        ARRAY
+    }*/
 
 }

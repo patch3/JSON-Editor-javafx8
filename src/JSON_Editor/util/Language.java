@@ -1,4 +1,4 @@
-package JSON_Editor.util;
+package util;
 
 public class Language {
     private final String key;

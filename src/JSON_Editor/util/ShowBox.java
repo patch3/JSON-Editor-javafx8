@@ -1,4 +1,4 @@
-package JSON_Editor.util;
+package util;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;

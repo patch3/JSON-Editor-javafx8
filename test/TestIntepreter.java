@@ -1,5 +1,5 @@
-import JSON_Editor.util.Interpreter;
 import org.junit.jupiter.api.Test;
+import util.Interpreter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

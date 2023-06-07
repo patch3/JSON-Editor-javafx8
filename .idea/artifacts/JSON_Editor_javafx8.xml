@@ -1,15 +1,17 @@
 <component name="ArtifactManager">
-  <artifact type="javafx" build-on-make="true" name="JSON-Editor-javafx8">
+  <artifact type="javafx" name="JSON-Editor-javafx8">
     <output-path>$PROJECT_DIR$/out/artifacts/JSON_Editor_javafx8</output-path>
     <properties id="javafx-properties">
       <options>
-        <option name="appClass" value="JSON_Editor.Main" />
+        <option name="alias" value="" />
+        <option name="appClass" value="Main" />
         <option name="convertCss2Bin" value="true" />
         <option name="description" value="" />
         <option name="enabledSigning" value="true" />
         <option name="htmlPlaceholderId" value="" />
+        <option name="keystore" value="" />
         <option name="nativeBundle" value="all" />
-        <option name="title" value="" />
+        <option name="title" value="JSON-Editor-javafx8" />
         <option name="vendor" value="" />
         <option name="version" value="" />
       </options>
@@ -17,7 +19,6 @@
     <root id="root">
       <element id="archive" name="JSON_Editor_javafx8.jar">
         <element id="module-output" name="JSON-Editor-javafx8" />
-        <element id="extracted-dir" path="$PROJECT_DIR$/lib/gson/gson-2.10.1.jar" path-in-jar="/" />
       </element>
     </root>
   </artifact>

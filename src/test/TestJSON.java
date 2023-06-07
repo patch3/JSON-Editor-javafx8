@@ -40,7 +40,7 @@ public class TestJSON {
 
         expected.add(new UnitJson(
                 "dependencies",
-                new ValueUnitsJson(
+                new ValueUnitsJsonList(
                         attachment,
                         TypeUnit.UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY)
@@ -92,7 +92,7 @@ public class TestJSON {
 
         expected.add(
             new ArrayUnitJson(
-                new ValueUnitsJson(
+                new ValueUnitsJsonList(
                         attachment,
                         TypeUnit.ARRAY_UNIT
                 ), ArrayUnitJson.TypeValue.UNITS_ARRAY
@@ -122,13 +122,13 @@ public class TestJSON {
         attachment.add(new ArrayUnitJson("egeg", UnitJson.TypeValue.STRING));
         attachment.add(new ArrayUnitJson("575", UnitJson.TypeValue.NUMBER));
         attachment.add(new ArrayUnitJson(
-                new ValueUnitsJson(
+                new ValueUnitsJsonList(
                         null,
                         TypeUnit.UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY
         ));
         attachment.add(new ArrayUnitJson(
-                new ValueUnitsJson(
+                new ValueUnitsJsonList(
                         null,
                         TypeUnit.ARRAY_UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY
@@ -137,7 +137,7 @@ public class TestJSON {
 
         expected.add(new UnitJson(
                 "dependencies",
-                new ValueUnitsJson(
+                new ValueUnitsJsonList(
                         attachment,
                         TypeUnit.ARRAY_UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY)
@@ -173,13 +173,13 @@ public class TestJSON {
         attachment.add(new ArrayUnitJson("egeg", UnitJson.TypeValue.STRING));
         attachment.add(new ArrayUnitJson("575", UnitJson.TypeValue.NUMBER));
         attachment.add(new ArrayUnitJson(
-                new ValueUnitsJson(
+                new ValueUnitsJsonList(
                         null,
                         TypeUnit.UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY
         ));
         attachment.add(new ArrayUnitJson(
-                new ValueUnitsJson(
+                new ValueUnitsJsonList(
                         null,
                         TypeUnit.ARRAY_UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY
@@ -188,7 +188,7 @@ public class TestJSON {
 
         expected.add(new UnitJson(
                 "dependencies",
-                new ValueUnitsJson(
+                new ValueUnitsJsonList(
                         attachment,
                         TypeUnit.ARRAY_UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY)

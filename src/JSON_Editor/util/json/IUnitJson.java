@@ -5,15 +5,20 @@ import java.util.List;
 public interface IUnitJson {
     Object getValue();
 
-    void setValue(IUnitJson value);
-
     List<IUnitJson> getValueList();
 
     TypeUnit getTypeUnit();
 
     TypeValue getTypeValue();
 
+    String getName();
+
+
+    void setValue(IUnitJson value);
+
     void setValue(Object value, TypeValue type);
+
+    void setName(Object name);
 
     @Override
     boolean equals(Object o);

@@ -1,107 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="scene1" cacheShape="false"
-            style="-fx-background-color: #fff;" xmlns="http://javafx.com/javafx/8.0.171"
-            fx:controller="controler.Home">
-    <children>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="44.0" prefWidth="600.0"
-                    style="-fx-background-color: #243b69;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                    AnchorPane.topAnchor="0.0">
-            <children>
-                <MenuButton layoutX="14.0" layoutY="7.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="72.0"
-                            styleClass="MenuButton" text="File" textFill="WHITE">
-                    <items>
-                        <Menu mnemonicParsing="false" text="Open">
-                            <items>
-                                <MenuItem fx:id="openLocal" mnemonicParsing="false" text="Locally"/>
-                                <MenuItem mnemonicParsing="false" text="Remotely"/>
-                            </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="Create">
-                            <items>
-                                <MenuItem fx:id="createLocal" mnemonicParsing="false" text="Locally"/>
-                                <MenuItem mnemonicParsing="false" text="Remotely"/>
-                            </items>
-                        </Menu>
-                        <MenuItem fx:id="save1" mnemonicParsing="false" text="Save"/>
-                        <MenuItem fx:id="save11" mnemonicParsing="false" text="Save"/>
-                        <MenuItem fx:id="exit1" mnemonicParsing="false" text="Exit"/>
-                    </items>
-                    <font>
-                        <Font size="14.0"/>
-                    </font>
-                </MenuButton>
-                <MenuButton layoutX="86.0" layoutY="7.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="101.0"
-                            styleClass="MenuButton" text="Connect" textFill="WHITE">
-                    <items>
-                        <MenuItem fx:id="configureConn" mnemonicParsing="false" text="Configure"/>
-                        <MenuItem mnemonicParsing="false" text="Action 2"/>
-                    </items>
-                    <font>
-                        <Font size="14.0"/>
-                    </font>
-                </MenuButton>
-                <MenuButton layoutX="259.0" layoutY="7.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="72.0"
-                            styleClass="MenuButton" text="info" textFill="WHITE">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Action 1"/>
-                        <MenuItem mnemonicParsing="false" text="Action 2"/>
-                    </items>
-                    <font>
-                        <Font size="14.0"/>
-                    </font>
-                </MenuButton>
-                <MenuButton layoutX="187.0" layoutY="7.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="72.0"
-                            styleClass="MenuButton" text="view" textFill="WHITE">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Action 1"/>
-                        <MenuItem mnemonicParsing="false" text="Action 2"/>
-                    </items>
-                    <font>
-                        <Font size="14.0"/>
-                    </font>
-                </MenuButton>
-                <Label alignment="CENTER" layoutX="450.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="44.0"
-                       prefWidth="150.0"
-                       style="-fx-text-fill: #fff; -fx-text-alignment: center; -fx-content-display: center;"
-                       text="JSON Editor" AnchorPane.rightAnchor="0.0">
-                    <font>
-                        <Font name="Verdana" size="20.0"/>
-                    </font>
-                </Label>
-            </children>
-        </AnchorPane>
-        <SplitPane dividerPositions="0.2591973244147157, 0.7290969899665551" layoutY="43.0" prefHeight="357.0"
-                   prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="43.0">
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="scene" cacheShape="false" style="-fx-background-color: #fff;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Home">
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="44.0" prefWidth="600.0" style="-fx-background-color: #243b69;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <MenuButton layoutX="14.0" layoutY="7.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="72.0" styleClass="MenuButton" text="File" textFill="WHITE">
             <items>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0"
-                            style="-fx-background-color: #243b69;"/>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                    <children>
-                        <TreeView fx:id="treeView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                  AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
-                    </children>
-                </AnchorPane>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                    <children>
-                        <TextField layoutX="6.0" layoutY="36.0" prefHeight="25.0" prefWidth="171.0"
-                                   AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="6.0"/>
-                        <TextArea layoutX="7.0" layoutY="93.0" prefHeight="152.0" prefWidth="171.0"
-                                  AnchorPane.bottomAnchor="110.0" AnchorPane.leftAnchor="7.0"
-                                  AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="93.0"/>
-                        <Button layoutX="6.0" layoutY="261.0" mnemonicParsing="false" prefHeight="33.0"
-                                prefWidth="171.0" text="Button" AnchorPane.bottomAnchor="61.0"
-                                AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="6.0"/>
-                        <Button layoutX="7.0" layoutY="308.0" mnemonicParsing="false" prefHeight="33.0"
-                                prefWidth="171.0" text="Button" AnchorPane.bottomAnchor="14.0"
-                                AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="5.0"/>
-                    </children>
-                </AnchorPane>
+                <Menu mnemonicParsing="false" text="Open">
+                    <MenuItem fx:id="openLocal" mnemonicParsing="false" text="Locally" />
+                    <MenuItem fx:id="openRemote" mnemonicParsing="false" text="Remotely" />
+                </Menu>
+                <Menu mnemonicParsing="false" text="Create">
+                    <MenuItem fx:id="createLocal" mnemonicParsing="false" text="Locally" />
+                    <MenuItem mnemonicParsing="false" text="Remotely" />
+                </Menu>
+                <MenuItem fx:id="saveFile" mnemonicParsing="false" text="Save" />
+                <MenuItem fx:id="saveAs" mnemonicParsing="false" text="Save as" />
+                <MenuItem fx:id="exitProg" mnemonicParsing="false" text="Exit" />
             </items>
-        </SplitPane>
-    </children>
+            <font>
+                <Font size="14.0" />
+            </font>
+        </MenuButton>
+        <MenuButton layoutX="86.0" layoutY="7.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="101.0" styleClass="MenuButton" text="Connect" textFill="WHITE">
+            <items>
+                <MenuItem fx:id="configureConn" mnemonicParsing="false" text="Configure" />
+                <MenuItem mnemonicParsing="false" text="Action 2" />
+            </items>
+            <font>
+                <Font size="14.0" />
+            </font>
+        </MenuButton>
+        <MenuButton layoutX="259.0" layoutY="7.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="72.0" styleClass="MenuButton" text="info" textFill="WHITE">
+            <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+                <MenuItem mnemonicParsing="false" text="Action 2" />
+            </items>
+            <font>
+                <Font size="14.0" />
+            </font>
+        </MenuButton>
+        <MenuButton layoutX="187.0" layoutY="7.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="72.0" styleClass="MenuButton" text="view" textFill="WHITE">
+            <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+                <MenuItem mnemonicParsing="false" text="Action 2" />
+            </items>
+            <font>
+                <Font size="14.0" />
+            </font>
+        </MenuButton>
+        <Label alignment="CENTER" layoutX="450.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="44.0" prefWidth="150.0" style="-fx-text-fill: #fff; -fx-text-alignment: center; -fx-content-display: center;" text="JSON Editor" AnchorPane.rightAnchor="0.0">
+            <font>
+                <Font name="Verdana" size="20.0" />
+            </font>
+        </Label>
+    </AnchorPane>
+    <SplitPane dividerPositions="0.2591973244147157, 0.7290969899665551" layoutY="43.0" prefHeight="357.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="43.0">
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="-fx-background-color: #243b69;" />
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+            <TreeView fx:id="treeView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        </AnchorPane>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+            <TextField layoutX="6.0" layoutY="36.0" prefHeight="25.0" prefWidth="171.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="6.0" />
+            <TextArea layoutX="7.0" layoutY="93.0" prefHeight="152.0" prefWidth="171.0" AnchorPane.bottomAnchor="110.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="93.0" />
+            <Button layoutX="6.0" layoutY="261.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="171.0" text="Button" AnchorPane.bottomAnchor="61.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="6.0" />
+            <Button layoutX="7.0" layoutY="308.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="171.0" text="Button" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="5.0" />
+        </AnchorPane>
+    </SplitPane>
 </AnchorPane>

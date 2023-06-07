@@ -22,7 +22,7 @@ public class UnitTestJson {
         ));
         int[] expected = {2, 1};
         ArrayUnitJson arrUnit = actualJson.getUnitValueIn(expected[0]).getUnitList().getArrayValueIn(expected[1]);
-        int[] actual = actualJson.indexOf(arrUnit, TypeUnit.ARRAY_UNIT);
+        int[] actual = actualJson.indexOf(arrUnit);
         assertArrayEquals(expected, actual);
     }
 
@@ -39,20 +39,20 @@ public class UnitTestJson {
         attachment.add(expected);
 
         attachment.add(new ArrayUnitJson(
-                new ValueUnitsJson(
+                new ValueUnitsJsonList(
                         null,
                         TypeUnit.UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY
         ));
         attachment.add(new ArrayUnitJson(
-                new ValueUnitsJson(
+                new ValueUnitsJsonList(
                         null,
                         TypeUnit.ARRAY_UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY
         ));
         valueJson.add(new UnitJson(
                 "dependencies",
-                new ValueUnitsJson(
+                new ValueUnitsJsonList(
                         attachment,
                         TypeUnit.ARRAY_UNIT
                 ), UnitJson.TypeValue.UNITS_ARRAY)

@@ -9,16 +9,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static util.json.ArrayUnitJson.START_VALUE_CHAR;
-
-public class ValueUnitsJson {
+public class ValueUnitsJsonList {
+    public static final char[] START_VALUE_CHAR = {'"', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '[', '{'};
     protected List<IUnitJson> value;
     protected TypeUnit type;
 
-    public ValueUnitsJson() {
+    public ValueUnitsJsonList() {
     }
 
-    public ValueUnitsJson(char[] chStr, int i) {
+    public ValueUnitsJsonList(char[] chStr, int i) {
         switch (chStr[i]) {
             case '{':
                 this.unitsInterpreter(chStr, i);
@@ -31,12 +30,12 @@ public class ValueUnitsJson {
         }
     }
 
-    public ValueUnitsJson(List<? extends IUnitJson> value, TypeUnit type) {
+    public ValueUnitsJsonList(List<? extends IUnitJson> value, TypeUnit type) {
         if (value == null) {
             this.value = null;
         } else {
             this.value = value.stream()
-                    .map(unit -> (IUnitJson) unit)
+                    .map(unit -> (IUnitJson)unit)
                     .collect(Collectors.toList());
         }
         this.type = type;
@@ -46,7 +45,7 @@ public class ValueUnitsJson {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ValueUnitsJson that = (ValueUnitsJson) o;
+        ValueUnitsJsonList that = (ValueUnitsJsonList) o;
         return Objects.equals(value, that.value) && type == that.type;
     }
 
@@ -176,8 +175,8 @@ public class ValueUnitsJson {
         throw new JsonException("UNEXPECTED_ENDING");
     }
 
-    public List<Integer> indexOf(Object value, TypeUnit type, List<Integer> result) {
-        List<? extends ArrayUnitJson> list;
+    /*public List<Integer> indexOf(Object value, TypeUnit type, List<Integer> result) {
+        List<? extends IUnitJson> list;
         int hash;
         int size;
         if (type == TypeUnit.UNIT && this.type == TypeUnit.UNIT) {
@@ -193,7 +192,7 @@ public class ValueUnitsJson {
                 } else if (unit.getTypeValue() == ArrayUnitJson.TypeValue.UNITS_ARRAY) {
                     List<Integer> tempResult = new ArrayList<Integer>(result);
                     tempResult.add(i);
-                    tempResult = ((ValueUnitsJson) unit.getValue()).indexOf(value, type, tempResult);
+                    tempResult = ((ValueUnitsJsonList) unit.getValue()).indexOf(value, type, tempResult);
                     if (tempResult != null) {
                         return tempResult;
                     }
@@ -213,7 +212,7 @@ public class ValueUnitsJson {
                 } else if (unit.getTypeValue() == ArrayUnitJson.TypeValue.UNITS_ARRAY) {
                     List<Integer> tempResult = new ArrayList<>(result);
                     tempResult.add(i);
-                    tempResult = ((ValueUnitsJson) unit.getValue()).indexOf(value, type, tempResult);
+                    tempResult = ((ValueUnitsJsonList) unit.getValue()).indexOf(value, type, tempResult);
                     if (tempResult != null) {
                         return tempResult;
                     }
@@ -229,7 +228,7 @@ public class ValueUnitsJson {
                 if (unit.getTypeValue() == ArrayUnitJson.TypeValue.UNITS_ARRAY) {
                     List<Integer> tempResult = new ArrayList<>(result);
                     tempResult.add(i);
-                    tempResult = ((ValueUnitsJson) unit.getValue()).indexOf(value, type, tempResult);
+                    tempResult = ((ValueUnitsJsonList) unit.getValue()).indexOf(value, type, tempResult);
                     if (tempResult != null) {
                         return tempResult;
                     }
@@ -245,12 +244,52 @@ public class ValueUnitsJson {
                 if (unit.getTypeValue() == ArrayUnitJson.TypeValue.UNITS_ARRAY) {
                     List<Integer> tempResult = new ArrayList<>(result);
                     tempResult.add(i);
-                    tempResult = ((ValueUnitsJson) unit.getValue()).indexOf(value, type, tempResult);
+                    tempResult = ((ValueUnitsJsonList) unit.getValue()).indexOf(value, type, tempResult);
                     if (tempResult != null) {
                         return tempResult;
                     }
                 }
             }
+        }
+        return null;
+    }*/
+
+
+    public List<Integer> indexOf(IUnitJson value, List<Integer> result) {
+        if (this.value == null) return null;
+        int size = this.value.size();
+        int hash = value.hashCode();
+
+        if (this.type == value.getTypeUnit()){
+            for (int i = 0; i < size; ++i) {
+                IUnitJson unit = this.value.get(i);
+                if (unit.hashCode() == hash){
+                    result.add(i);
+                    return result;
+                }
+                List<Integer> tempResult = this.findingElemint(value, unit, i, result);
+                if (tempResult != null) {
+                    return tempResult;
+                }
+            }
+        } else {
+            for (int i = 0; i < size; ++i) {
+                IUnitJson unit = this.value.get(i);
+                List<Integer> tempResult = this.findingElemint(value, unit, i, result);
+                if (tempResult != null) {
+                    return tempResult;
+                }
+            }
+        }
+        return null;
+    }
+
+    private List<Integer> findingElemint(IUnitJson value, IUnitJson unit, Integer i, List<Integer> result){
+        if (unit.getTypeValue() == IUnitJson.TypeValue.UNITS_ARRAY) {
+            List<Integer> tempResult = new ArrayList<>(result);
+            tempResult.add(i);
+            tempResult = ((ValueUnitsJsonList) unit.getValue()).indexOf(value, tempResult);
+            return tempResult;
         }
         return null;
     }

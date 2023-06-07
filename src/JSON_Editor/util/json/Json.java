@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Json extends ValueUnitsJson {
+public class Json extends ValueUnitsJsonList {
 
     public Json(File fileJson) throws IOException {
         this(
@@ -31,16 +31,17 @@ public class Json extends ValueUnitsJson {
     }
 
 
-    public int[] indexOf(ArrayUnitJson obj, TypeUnit type) {
-        return Convert.toIntArray(super.indexOf(obj, type, new ArrayList<Integer>()));
+    public int[] indexOf(IUnitJson obj) {
+        return Convert.toIntArray(
+                super.indexOf(obj,  new ArrayList<>())
+        );
     }
 
     public IUnitJson get(int[] indexes) {
-        List<? extends IUnitJson> valueList = this.value;
+        List<IUnitJson> valueList = super.value;
         IUnitJson element = null;
 
-        for (int i = 0; i < indexes.length; i++) {
-            int index = indexes[i];
+        for (int index : indexes) {
             int size = valueList.size();
             if (index >= 0 && index < size) {
                 element = valueList.get(index);

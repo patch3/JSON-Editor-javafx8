@@ -2,24 +2,23 @@ package util.json;
 
 import util.Interpreter;
 
-import java.util.List;
 import java.util.Objects;
 
 public class UnitJson extends AbstractElementJson {
     protected String name;
 
     public UnitJson() {
-        super(TypeUnit.ARRAY_UNIT);
+        super(TypeUnit.UNIT);
     }
 
     public UnitJson(String name) {
-        super(TypeUnit.ARRAY_UNIT);
+        super(TypeUnit.UNIT);
         this.name = name;
     }
 
 
     public UnitJson(String name, Object value, TypeValue type) {
-        super(value, type, TypeUnit.ARRAY_UNIT);
+        super(value, type, TypeUnit.UNIT);
         this.name = name;
     }
 
@@ -34,7 +33,12 @@ public class UnitJson extends AbstractElementJson {
 
     @Override
     public String toString() {
-        return String.format("\"%s\":%s", this.name, super.toString());
+        return this.toString(0);
+    }
+
+    @Override
+    public String toString(int d) {
+        return String.format("\"%s\": %s", this.name, super.toString(d));
     }
 
     @Override
@@ -61,7 +65,7 @@ public class UnitJson extends AbstractElementJson {
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override

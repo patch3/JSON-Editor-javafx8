@@ -29,6 +29,8 @@ public interface IUnitJson {
     @Override
     String toString();
 
+    String toString(int d);
+
     enum TypeValue {
         NUMBER,
         STRING,

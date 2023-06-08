@@ -3,15 +3,16 @@ package util.json;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.SyntaxException;
 import util.Interpreter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ValueUnitsJsonList {
     public static final char[] START_VALUE_CHAR = {'"', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '[', '{'};
+
+    private final String TAB = "  ";
+
     protected List<IUnitJson> value;
+
     protected TypeUnit type;
 
     public ValueUnitsJsonList() {
@@ -129,10 +130,12 @@ public class ValueUnitsJsonList {
         boolean postCheckValue = false;
         boolean checkValue = true;
 
+        int index = 0;
+
         int temp;
 
         List<ArrayUnitJson> units = new ArrayList<>();
-        ArrayUnitJson unit = new ArrayUnitJson();
+        ArrayUnitJson unit = new ArrayUnitJson(index);
 
         while (i < chStr.length) {
             char ch = chStr[i];
@@ -142,7 +145,7 @@ public class ValueUnitsJsonList {
                     if (postCheckValue) {
                         checkValue = true;
                         postCheckValue = false;
-                        unit = new ArrayUnitJson();
+                        unit = new ArrayUnitJson(index++);
                     }
                     break;
                 case ']':
@@ -284,7 +287,47 @@ public class ValueUnitsJsonList {
         return null;
     }
 
-    private List<Integer> findingElemint(IUnitJson value, IUnitJson unit, Integer i, List<Integer> result){
+
+    public IUnitJson get(int[] indexes) {
+        List<IUnitJson> valueList = this.value;
+        IUnitJson element = null;
+
+        for (int index : indexes) {
+            if (index >= 0 && index < valueList.size()) {
+                element = valueList.get(index);
+                if (element.getTypeValue() == IUnitJson.TypeValue.UNITS_ARRAY) {
+                    valueList = element.getValueList();
+                } else {
+                    valueList = null;
+                }
+            }
+        }
+        return element;
+    }
+
+    public void set(int[] indexes, IUnitJson element) {
+        List<IUnitJson> valueList = this.value;
+        IUnitJson tempElementUnit = null;
+
+        for (int index : indexes) {
+            if (index >= 0 && index < valueList.size()) {
+                if (index == indexes.length - 1) {
+                    valueList.set(index, element);
+                    return;
+                }
+
+                tempElementUnit = valueList.get(index);
+                if (tempElementUnit.getTypeValue() == IUnitJson.TypeValue.UNITS_ARRAY) {
+                    valueList = tempElementUnit.getValueList();
+                } else {
+                    valueList = null;
+                }
+            } else throw new RuntimeException("Invalid index");
+        }
+        throw new RuntimeException("Unable to set");
+    }
+
+    private List<Integer> findingElemint(IUnitJson value, IUnitJson unit, Integer i, List<Integer> result) {
         if (unit.getTypeValue() == IUnitJson.TypeValue.UNITS_ARRAY) {
             List<Integer> tempResult = new ArrayList<>(result);
             tempResult.add(i);
@@ -347,6 +390,60 @@ public class ValueUnitsJsonList {
     public void setValue(List<IUnitJson> value, TypeUnit type) {
         this.value = value;
         this.type = type;
+    }
+
+
+    @Override
+    public String toString() {
+        return this.toString(0);
+    }
+
+    public String toString(int d) {
+        List<IUnitJson> unitList = this.value;
+
+        StringBuilder sb = new StringBuilder();
+
+        int newDepth = d + 1;
+        if (this.getType() == TypeUnit.UNIT) {
+            sb.append("{\r\n");
+            if (unitList != null) {
+                int size = unitList.size();
+                for (int i = 0; i < size; i++) {
+                    sb.append(tabs(newDepth));
+                    sb.append(unitList.get(i).toString(newDepth));
+                    if (i >= size - 1) {
+                        sb.append("\r\n");
+                    } else {
+                        sb.append(",\r\n");
+                    }
+                }
+            }
+            sb.append(tabs(d));
+            sb.append("}");
+        } else if (this.getType() == TypeUnit.ARRAY_UNIT) {
+            sb.append("[\r\n");
+            if (unitList != null) {
+                int size = unitList.size();
+                for (int i = 0; i < size; i++) {
+                    sb.append(tabs(newDepth));
+                    sb.append(unitList.get(i).toString(newDepth));
+                    if (i >= size - 1) {
+                        sb.append("\r\n");
+                    } else {
+                        sb.append(",\r\n");
+                    }
+                }
+            }
+            sb.append(tabs(d));
+            sb.append("]");
+        } else {
+            throw new JsonException("UNEXP_TYPE");
+        }
+        return sb.toString();
+    }
+
+    protected String tabs(int d) {
+        return String.join("", Collections.nCopies(d, TAB));
     }
 
     /*public enum TypeValue {

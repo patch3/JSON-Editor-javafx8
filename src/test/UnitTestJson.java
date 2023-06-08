@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.Test;
+import util.FileUtils;
 import util.json.*;
 
 import java.io.File;
@@ -11,13 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UnitTestJson {
-
     @Test
     public void testHardIndexOf() throws IOException {
         Json actualJson = new Json(new File(
                 Objects.requireNonNull(
                         getClass()
-                                .getResource("/resource/hard.json")
+                                .getResource("resource/hard.json")
                 ).getPath()
         ));
         int[] expected = {2, 1};
@@ -27,7 +27,7 @@ public class UnitTestJson {
     }
 
     @Test
-    public void testHardGetJson() throws IOException {
+    public void testHardGetJson() {
         List<UnitJson> valueJson = new ArrayList<>();
         valueJson.add(new UnitJson("name", "resource", UnitJson.TypeValue.STRING));
         valueJson.add(new UnitJson("version", "3647", UnitJson.TypeValue.NUMBER));
@@ -61,6 +61,33 @@ public class UnitTestJson {
 
         int[] expectedIndex = {2, 1};
         ArrayUnitJson actual = (ArrayUnitJson) (Json.get(expectedIndex));
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testHardSetJson() throws IOException {
+        String path = Objects.requireNonNull(getClass().getResource("resource/hard.json")).getPath().replaceFirst("^/(.:/)", "$1");
+
+        Json json = new Json(new File(path));
+        IUnitJson expected = new UnitJson("name", "resource", UnitJson.TypeValue.STRING);
+        int[] expectedIndex = {2, 1};
+        json.set(expectedIndex, expected);
+
+        IUnitJson actual = json.get(expectedIndex);
+
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testHardJsonToString() throws IOException {
+        String path = Objects.requireNonNull(getClass().getResource("resource/hard.json")).getPath().replaceFirst("^/(.:/)", "$1");
+        String expected = FileUtils.readFile(path);
+
+        Json actualJson = new Json(new File(path));
+
+        String actual = actualJson.toString();
 
         assertEquals(expected, actual);
     }

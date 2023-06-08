@@ -3,7 +3,6 @@ package util.json;
 import com.sun.istack.internal.Nullable;
 import util.Interpreter;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,6 +28,13 @@ public abstract class AbstractElementJson implements IUnitJson {
         this(type);
         this.typeValue = typeValue;
         this.value = value;
+    }
+
+    public AbstractElementJson(AbstractElementJson obj) {
+        this.id = obj.id;
+        this.TYPE_UNIT = obj.TYPE_UNIT;
+        this.value = obj.value;
+        this.typeValue = obj.typeValue;
     }
 
     public int valueInterpreter(char[] chStr, int i) {
@@ -158,54 +164,25 @@ public abstract class AbstractElementJson implements IUnitJson {
         return Objects.hash(TYPE_UNIT, value, typeValue, id);
     }
 
-    @Override
     public String toString() {
-        return toString(0);
+        return this.toString(0);
     }
 
     // toString с глубеной
     public String toString(int d) {
-        if (this.typeValue == TypeValue.UNITS_ARRAY){
-            StringBuilder sb;
-            List<IUnitJson> unitList = this.getValueList();
-            int size = unitList.size() + 1;
-            int newDepth = d+1;
-            if (this.getTypeUnit() == TypeUnit.UNIT){
-                sb = new StringBuilder(tabs(d));
-                sb.append("{\n");
-                for (int i = 0; i < size; i++) {
-                    sb.append(tabs(newDepth));
-                    sb.append(unitList.get(i).toString());
-                    if (i >= size-1) {
-                        sb.append('\n');
-                    } else {
-                        sb.append(",\n");
-                    }
-                }
-                sb.append("]\n");
-            } else if (this.getTypeUnit() == TypeUnit.ARRAY_UNIT) {
-                sb = new StringBuilder(tabs(d));
-                sb.append("[\n");
-                for (int i = 0; i < size; i++) {
-                    sb.append(tabs(newDepth));
-                    sb.append(unitList.get(i).toString());
-                    sb.append("\n");
-                }
-                sb.append("]\n");
-            } else {
-                throw new JsonException("UNEXP_TYPE");
-            }
-            return sb.toString();
-        } else if (this.typeValue == TypeValue.STRING){
+        if (this.typeValue == TypeValue.UNITS_ARRAY) {
+            return this.getUnitList().toString(d);
+        } else if (this.typeValue == TypeValue.STRING) {
             return String.format("\"%s\"", this.value);
-        } if (this.typeValue == TypeValue.NUMBER) {
+        }
+        if (this.typeValue == TypeValue.NUMBER) {
             return (String) this.value;
-        } return null;
+        }
+        return null;
     }
 
-    protected String tabs(int d) {
-        return String.join("",Collections.nCopies(d, String.valueOf('\t')));
-    }
+    @Override
+    public abstract String getName();
 
     @Override
     public Object getValue() {

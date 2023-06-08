@@ -19,6 +19,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        System.setProperty("com.sun.javafx.tree.TreeCell.maxCells", "10000");
         Parent root = FXMLLoader.load(
                 Objects.requireNonNull(
                         Main.class.getResource("fxml/home.fxml")

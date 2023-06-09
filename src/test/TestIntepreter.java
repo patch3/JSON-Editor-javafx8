@@ -1,5 +1,5 @@
 import org.junit.Test;
-import util.Interpreter;
+import src.util.Interpreter;
 
 import static org.junit.Assert.assertEquals;
 

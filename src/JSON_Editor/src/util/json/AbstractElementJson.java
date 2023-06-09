@@ -1,7 +1,7 @@
-package util.json;
+package src.util.json;
 
 import com.sun.istack.internal.Nullable;
-import util.Interpreter;
+import src.util.Interpreter;
 
 import java.util.List;
 import java.util.Objects;

@@ -1,25 +1,25 @@
-package util.directory;
+package src.util.directory;
 
 import com.sun.istack.internal.Nullable;
-import util.FileUtils;
+import src.util.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class directory extends IDirectory {
+public class Directory extends IDirectory {
     public List<DirectoryElement> elementlist = new ArrayList<>();
     public List<DirectoryElement> jsonFiles = new ArrayList<>();
-    private File rootFile;
     public String pathToElement;
     @Nullable
     private File parentDir;
+    public boolean isRemote;
 
-    public directory(File workDir, @Nullable File parent) {
+    public Directory(File workDir, @Nullable File parent) {
+        isRemote = false;
         pathToElement = workDir.getPath();
         parentDir = parent;
-        rootFile = workDir;
         if (!workDir.exists()) {
             throw new NullPointerException("Папка " + workDir.getAbsolutePath() + " не найдена");
         }
@@ -37,9 +37,10 @@ public class directory extends IDirectory {
         }
     }
 
-    public directory(DirectoryElement element) {
-        parentDir = new File(element.pathToParent);
-        rootFile = new File(element.pathToElement);
+    public Directory(DirectoryElement element) {
+        isRemote = false;
+        parentDir = new File(element.parentDir.pathToElement);
+        File rootFile = new File(element.pathToElement);
         if (!rootFile.exists()) {
             throw new NullPointerException("Папка " + rootFile.getAbsolutePath() + " не найдена");
         }
@@ -57,10 +58,18 @@ public class directory extends IDirectory {
         }
     }
 
+    public Directory(List<DirectoryElement> folders, List<DirectoryElement> jsons, String pathToElement, boolean remote) {
+        isRemote = remote;
+        elementlist = folders;
+        jsonFiles = jsons;
+        this.pathToElement = pathToElement;
+    }
+
 
     @Override
     public String getName() {
-        return rootFile.getName();
+        return new File(pathToElement).getName();
     }
+
 
 }

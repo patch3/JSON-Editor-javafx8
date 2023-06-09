@@ -1,8 +1,8 @@
-package util.json;
+package src.util.json;
 
-import util.Convert;
-import util.FileUtils;
-import util.Interpreter;
+import src.util.Convert;
+import src.util.FileUtils;
+import src.util.Interpreter;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +18,8 @@ public class Json extends ValueUnitsJsonList {
 
     public Json(String str) {
         super(str.toCharArray(), Interpreter.skipChar(str.toCharArray(), 0));
+
+
     }
 
     public Json(List<? extends IUnitJson> obj, TypeUnit type) {

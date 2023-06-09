@@ -1,6 +1,7 @@
-package util.json;
+package src.util.json;
 
-import util.Interpreter;
+
+import src.util.Interpreter;
 
 import java.util.Objects;
 

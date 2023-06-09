@@ -1,6 +1,6 @@
 import org.junit.Test;
-import util.FileUtils;
-import util.json.*;
+import src.util.FileUtils;
+import src.util.json.*;
 
 import java.io.File;
 import java.io.IOException;

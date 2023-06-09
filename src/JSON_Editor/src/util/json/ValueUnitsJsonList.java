@@ -1,6 +1,7 @@
-package util.json;
+package src.util.json;
 
-import util.Interpreter;
+
+import src.util.Interpreter;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,6 +19,9 @@ public class ValueUnitsJsonList {
     }
 
     public ValueUnitsJsonList(char[] chStr, int i) throws JsonException {
+        if (chStr.length < 2) {
+            chStr = new char[]{'{', '}'};
+        }
         switch (chStr[i]) {
             case '{':
                 this.unitsInterpreter(chStr, i);
@@ -226,9 +230,10 @@ public class ValueUnitsJsonList {
     public void set(int[] indexes, IUnitJson element) {
         List<IUnitJson> valueList = this.value;
         IUnitJson tempElementUnit;
-        for (int index : indexes) {
+        for (int i = 0; i < indexes.length; ++i) {
+            int index = indexes[i];
             if (index >= 0 && index < valueList.size()) {
-                if (index == indexes.length - 1) {
+                if (i == indexes.length - 1) {
                     valueList.set(index, element);
                     return;
                 }

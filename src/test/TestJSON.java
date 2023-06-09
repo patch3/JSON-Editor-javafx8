@@ -1,4 +1,5 @@
 import org.junit.Test;
+import src.util.json.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 public class TestJSON {
     @Test
     public void testSimpleJsonUnitsList() {
-        List<util.json.UnitJson> expected = new ArrayList<>();
+        List<UnitJson> expected = new ArrayList<>();
         expected.add(new UnitJson("name", "Test", UnitJson.TypeValue.STRING));
         expected.add(new UnitJson("tester", "123", UnitJson.TypeValue.NUMBER));
 

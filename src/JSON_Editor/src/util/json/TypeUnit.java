@@ -1,4 +1,4 @@
-package util.json;
+package src.util.json;
 
 public enum TypeUnit {
     UNIT,

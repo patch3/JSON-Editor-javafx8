@@ -1,7 +1,7 @@
-package util;
+package src.util;
 
 import jdk.nashorn.internal.runtime.regexp.joni.exception.SyntaxException;
-import util.json.JsonException;
+import src.util.json.JsonException;
 
 import java.math.BigInteger;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package JSON_Editor.manager;
+package src.manager;
 
 import java.io.File;
 

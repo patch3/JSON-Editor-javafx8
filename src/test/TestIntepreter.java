@@ -1,13 +1,13 @@
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import util.Interpreter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 
 public class TestIntepreter {
 
     @Test
-    public void testInterString(){
+    public void testInterString() {
         String testForString = "tjy\"test1\" tyytky tkk";
         String res = Interpreter.string(testForString.toCharArray(), 4);
         assertEquals("test1", res);

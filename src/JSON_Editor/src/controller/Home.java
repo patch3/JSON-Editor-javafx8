@@ -1,4 +1,4 @@
-package controller;
+package src.controller;
 
 import com.sun.istack.internal.Nullable;
 import javafx.event.Event;
@@ -17,7 +17,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import jdk.jfr.internal.tool.Main;
 import util.directory.DirectoryElement;
 import util.directory.IDirectory;
 import util.directory.directory;
@@ -48,6 +47,10 @@ public class Home {
     public TreeView<IUnitJson> treeView;
     @FXML
     private MenuItem openLocalFolder;
+    @FXML
+    private MenuItem openFolderRemote;
+    @FXML
+    private MenuItem openRemote;
 
     public Json json;
 
@@ -65,6 +68,8 @@ public class Home {
         configureConn.setOnAction(this::eventClickConfigureConn);
         openLocalFolder.setOnAction(this::eventClickOpenLocalFolder);
 
+        openFolderRemote.setOnAction(this::eventClickOpenRemoteFolder);
+
 
         directoryTreeView.setEditable(false);
         directoryTreeView.setShowRoot(true);
@@ -75,6 +80,10 @@ public class Home {
         treeView.setShowRoot(false);
         treeView.setCellFactory(param -> createTextFieldTreeCell());
         treeView.setOnEditCommit(this::onEditCommit);
+    }
+
+    private void eventClickOpenRemoteFolder(Event event) {
+        //SFTPClient client = new SFTPClient(); //TODO ДОДЕЛАТЬ
     }
 
     private TreeCell<IDirectory> createDirectoryTreeView(TreeView<IDirectory> treeView) {
@@ -93,14 +102,32 @@ public class Home {
     }
 
     private void onDirectoryTreeViewClick(MouseEvent event) {
-        if (event.getClickCount() > 2) {
+        if (event.getClickCount() >= 2) {
             TreeItem<IDirectory> selectedItem = directoryTreeView.getSelectionModel().getSelectedItem();
             if (selectedItem != null) {
+                if (selectedItem.getValue() instanceof directory) return;
                 DirectoryElement selectedObject = (DirectoryElement) selectedItem.getValue();
-                System.err.println(selectedObject.isJson);
+                if (selectedObject.isJson) {
+                    try {
+                        Json json = new Json(new File(selectedObject.pathToElement));
+                        showJson(json);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    directory directory = new directory(selectedObject);
+                    for (IDirectory element : directory.elementlist) {
+                        selectedItem.getChildren().add(new TreeItem<>(element));
+                    }
+                    for (IDirectory element : directory.jsonFiles) {
+                        selectedItem.getChildren().add(new TreeItem<>(element));
+                    }
+                    selectedItem.setExpanded(true);
+                }
             }
         }
     }
+
 
 
     private void eventClickOpenLocalFolder(Event event) {
@@ -110,7 +137,7 @@ public class Home {
         workDirectory = chooser.showDialog(scene.getScene().getWindow());
 
         if (workDirectory == null) return;
-        directory dir = new directory(workDirectory);
+        directory dir = new directory(workDirectory, null);
         TreeItem<IDirectory> rootItem = new TreeItem<>(dir);
         for (DirectoryElement directoryElement : dir.elementlist) {
             TreeItem<IDirectory> item = new TreeItem<>(directoryElement);
@@ -179,6 +206,7 @@ public class Home {
             this.json = new Json(workFile);
             this.showJson(json);
         } catch (IOException e) {
+
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -189,7 +217,7 @@ public class Home {
         stage.setTitle("Configure");
         Parent root = null;
         try {
-            root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("fxml\\configure_conn.fxml")));
+            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../fxml/configure_conn.fxml")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -203,40 +231,18 @@ public class Home {
     private void onEditCommit(TreeView.EditEvent<IUnitJson> event) {
         TreeItem<IUnitJson> editedItem = event.getTreeItem();
         event.getNewValue().setValue(event.getOldValue());// на всякий крайний
-        int[] intdex = this.json.indexOf(editedItem.getValue());
-        IUnitJson object = this.json.get(intdex);
+        int[] index = this.json.indexOf(editedItem.getValue());
+        IUnitJson object = this.json.get(index);
 
         object = event.getNewValue();
         object.setValue(event.getOldValue());
         editedItem.setValue(object);
-        this.json.set(intdex, object);
+        this.json.set(index, object);
 
         treeView.refresh(); // Обновление TreeView
     }
 
     /*public void showJson(Json json) {
-        TreeItem<IUnitJson> rootItem = new TreeItem<>();
-        rootItem.setExpanded(true);
-        if (json.getType() == TypeUnit.ARRAY_UNIT) {
-            List<ArrayUnitJson> unitJson = json.getArrayValue();
-            int size = unitJson.size();
-            for (int i = 0; i < size; ++i) {
-                TreeItem<IUnitJson> item = new TreeItem<>(unitJson.get(i));
-                rootItem.getChildren().add(item);
-            }
-        } else if (json.getType() == TypeUnit.UNIT) {
-            List<UnitJson> unitJson = json.getUnitsValue();
-            int size = unitJson.size();
-            for (int i = 0; i < size; ++i) {
-                TreeItem<IUnitJson> item = new TreeItem<>(unitJson.get(i));
-                rootItem.getChildren().add(item);
-            }
-        }
-        treeView.setRoot(rootItem);
-        //treeView.setShowRoot(false);
-    }*/
-
-    public void showJson(Json json) {
         treeView.setRoot(this.recursionShowJson(json.getValue()));
     }
 
@@ -245,27 +251,52 @@ public class Home {
         rootItem.setExpanded(true);
         if (unitList != null) {
             for (IUnitJson iUnitJson : unitList) {
-                TreeItem<IUnitJson> item = new TreeItem<>(iUnitJson);
+                TreeItem<IUnitJson> item;
                 if (iUnitJson.getValue() instanceof ValueUnitsJsonList) {
+                    item = new TreeItem<>();
                     item.getChildren().add(recursionShowJson(iUnitJson.getValueList()));
+                } else {
+                    item = new TreeItem<>(iUnitJson);
                 }
                 rootItem.getChildren().add(item);
             }
         }
         return rootItem;
+    }*/
+
+
+    public void showJson(Json json) {
+        List<IUnitJson> unitList = json.getValue();
+        TreeItem<IUnitJson> rootItem = new TreeItem<>();
+        rootItem.setExpanded(true);
+        if (unitList != null) {
+            for (IUnitJson iUnitJson : unitList) {
+                TreeItem<IUnitJson> item = new TreeItem<>(iUnitJson);
+                if (iUnitJson.getValue() instanceof ValueUnitsJsonList) {
+                    item.getChildren().add(recursionShowJson(iUnitJson));
+                }
+                rootItem.getChildren().add(item);
+            }
+        }
+
+        treeView.setRoot(rootItem);
     }
 
-    /*private TreeItem<IUnitJson> createTreeItem(IUnitJson obj) {
+    private TreeItem<IUnitJson> recursionShowJson(IUnitJson obj) {
         TreeItem<IUnitJson> item = new TreeItem<>(obj);
-        if (obj.getTypeValue() == IUnitJson.TypeValue.UNITS_ARRAY) {
-            List<IUnitJson> unitsList = obj.getValueList();
-            for (IUnitJson childObject : unitsList) {
-                TreeItem<IUnitJson> childItem = createTreeItem(childObject);
-                item.getChildren().add(childItem);
+        List<IUnitJson> valueList = obj.getValueList();
+        if (valueList != null) {
+            for (IUnitJson iUnitJson : valueList) {
+                if (iUnitJson.getValue() instanceof ValueUnitsJsonList) {
+                    item.getChildren().add(recursionShowJson(iUnitJson));
+                } else {
+                    TreeItem<IUnitJson> childItem = new TreeItem<>(iUnitJson);
+                    item.getChildren().add(childItem);
+                }
             }
         }
         return item;
-    }*/
+    }
 
     private TextFieldTreeCell<IUnitJson> createTextFieldTreeCell() {
         return new TextFieldTreeCell<>(new StringConverter<IUnitJson>() {
@@ -280,6 +311,4 @@ public class Home {
             }
         });
     }
-
-
 }

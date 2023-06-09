@@ -1,10 +1,12 @@
-import JSON_Editor.manager.Dirs;
-import config.FilesCfg;
+package src;
+
+import src.config.FilesCfg;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import src.manager.Dirs;
 
 import java.io.File;
 import java.util.Objects;
@@ -19,16 +21,15 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        System.setProperty("com.sun.javafx.tree.TreeCell.maxCells", "10000");
         Parent root = FXMLLoader.load(
                 Objects.requireNonNull(
-                        Main.class.getResource("fxml/home.fxml")
+                        Main.class.getResource("src/fxml/home.fxml")
                 )
         );
         root.getStylesheets().add(
                 Objects.requireNonNull(
                         Main.class.getResource(
-                                "css/main.css"
+                                "src/css/main.css"
                         )
                 ).toExternalForm()
         );

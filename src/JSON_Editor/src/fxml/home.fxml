@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane fx:id="scene" cacheShape="false" style="-fx-background-color: #fff;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Home">
+<AnchorPane fx:id="scene" cacheShape="false" style="-fx-background-color: #fff;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="src.controller.Home">
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="44.0" prefWidth="600.0" style="-fx-background-color: #243b69;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <MenuButton layoutX="14.0" layoutY="7.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="72.0" styleClass="MenuButton" text="File" textFill="WHITE">
             <items>
@@ -14,12 +14,12 @@
                 <Menu mnemonicParsing="false" text="OpenFolder">
                     <items>
                         <MenuItem fx:id="openLocalFolder" mnemonicParsing="false" text="Locally"/>
-                        <MenuItem fx:id="openRemote1" mnemonicParsing="false" text="Remotely"/>
+                        <MenuItem fx:id="openFolderRemote" mnemonicParsing="false" text="Remotely"/>
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Create">
                     <MenuItem fx:id="createLocal" mnemonicParsing="false" text="Locally"/>
-                    <MenuItem mnemonicParsing="false" text="Remotely"/>
+                    <MenuItem fx:id="createRemote" mnemonicParsing="false" text="Remotely"/>
                 </Menu>
                 <MenuItem fx:id="saveFile" mnemonicParsing="false" text="Save"/>
                 <MenuItem fx:id="saveAs" mnemonicParsing="false" text="Save as"/>
@@ -32,7 +32,7 @@
         <MenuButton layoutX="86.0" layoutY="7.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="101.0" styleClass="MenuButton" text="Connect" textFill="WHITE">
             <items>
                 <MenuItem fx:id="configureConn" mnemonicParsing="false" text="Configure" />
-                <MenuItem mnemonicParsing="false" text="Action 2" />
+                <MenuItem fx:id="connect" mnemonicParsing="false" text="Action 2"/>
             </items>
             <font>
                 <Font size="14.0" />
@@ -53,12 +53,14 @@
                 <MenuItem mnemonicParsing="false" text="Action 2" />
             </items>
             <font>
-                <Font size="14.0" />
+                <Font size="14.0"/>
             </font>
         </MenuButton>
-        <Label alignment="CENTER" layoutX="450.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="44.0" prefWidth="150.0" style="-fx-text-fill: #fff; -fx-text-alignment: center; -fx-content-display: center;" text="JSON Editor" AnchorPane.rightAnchor="0.0">
+        <Label alignment="CENTER" layoutX="450.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="44.0" prefWidth="150.0"
+               style="-fx-text-fill: #fff; -fx-text-alignment: center; -fx-content-display: center;" text="JSON Editor"
+               AnchorPane.rightAnchor="0.0">
             <font>
-                <Font name="Verdana" size="20.0" />
+                <Font name="Verdana" size="20.0"/>
             </font>
         </Label>
     </AnchorPane>

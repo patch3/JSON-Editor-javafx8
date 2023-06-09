@@ -1,10 +1,5 @@
 package util.json;
 
-import com.sun.istack.internal.Nullable;
-import util.Interpreter;
-import util.json.IUnitJson.TypeValue;
-
-import java.util.List;
 import java.util.Objects;
 
 public class ArrayUnitJson extends AbstractElementJson {
@@ -17,6 +12,7 @@ public class ArrayUnitJson extends AbstractElementJson {
 
     public ArrayUnitJson(int index){
         this();
+        this.index = index;
     }
 
     public ArrayUnitJson(Object value, TypeValue typeValue) {

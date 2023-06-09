@@ -1,5 +1,4 @@
-import org.junit.jupiter.api.Test;
-import util.json.*;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 
 public class TestJSON {
     @Test
     public void testSimpleJsonUnitsList() {
-        List<UnitJson> expected = new ArrayList<UnitJson>();
+        List<util.json.UnitJson> expected = new ArrayList<>();
         expected.add(new UnitJson("name", "Test", UnitJson.TypeValue.STRING));
         expected.add(new UnitJson("tester", "123", UnitJson.TypeValue.NUMBER));
 

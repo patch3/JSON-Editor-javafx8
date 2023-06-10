@@ -3,6 +3,7 @@ package src.util;
 import com.jcraft.jsch.*;
 import src.util.directory.Directory;
 import src.util.directory.DirectoryElement;
+import src.util.directory.IDirectory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -13,6 +14,9 @@ import java.util.List;
 import java.util.Vector;
 
 public class SFTPClient {
+    public static List<SFTPClient> connections = new ArrayList<>();
+
+
     private String hostname;
     private int port;
     private String username;
@@ -34,11 +38,12 @@ public class SFTPClient {
         session = jsch.getSession(username, hostname, port);
         session.setPassword(password);
         session.setConfig("StrictHostKeyChecking", "no");
-        session.connect(2000);
+        session.connect(5000);
 
         Channel channel = session.openChannel("sftp");
         channel.connect();
         channelSftp = (ChannelSftp) channel;
+        connections.add(this);
         connected = true;
     }
 
@@ -49,6 +54,7 @@ public class SFTPClient {
         if (session != null) {
             session.disconnect();
         }
+        connections.remove(this);
         connected = false;
     }
 
@@ -104,7 +110,7 @@ public class SFTPClient {
         return path;
     }
 
-    public Directory getDirectory(String remoteFolderPath, Directory parent) throws SftpException {
+    public Directory getDirectory(String remoteFolderPath, IDirectory parent) throws SftpException {
         List<DirectoryElement> jsons = new ArrayList<>();
         List<DirectoryElement> folders = new ArrayList<>();
         remoteFolderPath = remoteFolderPath.replace("\\", "/");
@@ -138,8 +144,6 @@ public class SFTPClient {
             inputStream = new FileInputStream(localFile);
 
             channelSftp.put(inputStream, remoteFilePath, ChannelSftp.OVERWRITE);
-
-            System.out.println("Файл успешно загружен на сервер и заменил старый файл.");
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -150,5 +154,31 @@ public class SFTPClient {
                 }
             }
         }
+    }
+
+    public void createFile(String remoteFilePath) throws SftpException {
+
+        remoteFilePath = remoteFilePath.replace("\\", "/");
+        System.err.println(remoteFilePath);
+
+        channelSftp.put(new ByteArrayInputStream(new byte[0]), remoteFilePath);
+    }
+
+    public void createDirectory(String remoteDirectoryPath) throws SftpException {
+        remoteDirectoryPath = remoteDirectoryPath.replace("\\", "/");
+        System.err.println(remoteDirectoryPath);
+        channelSftp.mkdir(remoteDirectoryPath);
+    }
+
+    public void deleteFile(String remoteFilePath) throws SftpException {
+        remoteFilePath = remoteFilePath.replace("\\", "/");
+        channelSftp.rm(remoteFilePath);
+
+    }
+
+    public void deleteDirectory(String remoteDirectoryPath) throws SftpException {
+        remoteDirectoryPath = remoteDirectoryPath.replace("\\", "/");
+        channelSftp.rmdir(remoteDirectoryPath);
+
     }
 }

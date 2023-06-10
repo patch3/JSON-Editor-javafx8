@@ -2,6 +2,7 @@ package src.util.directory;
 
 import com.sun.istack.internal.Nullable;
 import src.util.FileUtils;
+import src.util.TranslationTextComponent;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class Directory extends IDirectory {
         pathToElement = workDir.getPath();
         parentDir = parent;
         if (!workDir.exists()) {
-            throw new NullPointerException("Папка " + workDir.getAbsolutePath() + " не найдена");
+            throw new NullPointerException(new TranslationTextComponent("exception.dirNotFound", workDir.getAbsolutePath()).toString());
         }
         if (workDir.listFiles() == null) {
             return;
@@ -42,7 +43,7 @@ public class Directory extends IDirectory {
         parentDir = new File(element.parentDir.pathToElement);
         File rootFile = new File(element.pathToElement);
         if (!rootFile.exists()) {
-            throw new NullPointerException("Папка " + rootFile.getAbsolutePath() + " не найдена");
+            throw new NullPointerException(new TranslationTextComponent("exception.dirNotFound", rootFile.getAbsolutePath()).toString());
         }
         if (rootFile.listFiles() == null) {
             return;

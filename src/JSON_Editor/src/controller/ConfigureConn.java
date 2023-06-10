@@ -10,6 +10,7 @@ import javafx.scene.layout.AnchorPane;
 import src.Main;
 import src.util.SFTPClient;
 import src.util.ShowBox;
+import src.util.TranslationTextComponent;
 import src.util.json.IUnitJson;
 import src.util.json.Json;
 import src.util.json.TypeUnit;
@@ -68,12 +69,11 @@ public class ConfigureConn {
             }
 
         } catch (Exception e) {
-            ShowBox.showError("Произошла ошибки при загрузке настроек, пересоздаю файл");
             settingsFile.delete();
             try {
                 settingsFile.createNewFile();
             } catch (IOException ex) {
-                ShowBox.showError("Невозможно создать файл!");
+                ShowBox.showError(new TranslationTextComponent("error.configurecon.unabletocreatefile", settingsFile.getAbsolutePath()));
             }
         }
     }
@@ -92,7 +92,7 @@ public class ConfigureConn {
                     System.out.println("Создан новый файл коннекта");
                 }
             } catch (IOException e) {
-                ShowBox.showError("Невозможно создать файл!");
+                ShowBox.showError(new TranslationTextComponent("error.configurecon.unabletocreatefile", settingsFile.getAbsolutePath()));
                 return;
             }
         }
@@ -128,9 +128,9 @@ public class ConfigureConn {
         SFTPClient client = new SFTPClient(hostName.getText(), Integer.parseInt(port.getText()), userName.getText(), password.getText());
         try {
             client.connect();
-            ShowBox.showInfo("Успешно", "Подключение прошло успешно");
+            ShowBox.showInfo(new TranslationTextComponent("success"), new TranslationTextComponent("connection.success"));
         } catch (JSchException e) {
-            ShowBox.showInfo("Не успешно", "Подключение не удалось");
+            ShowBox.showInfo(new TranslationTextComponent("unsuccess"), new TranslationTextComponent("connection.unsuccessful"));
         } finally {
             if (client.isConnected()) {
                 client.disconnect();
@@ -152,19 +152,19 @@ public class ConfigureConn {
 
     private boolean checkInputCorrect(){
         if (hostName.getText().isEmpty()) {
-            ShowBox.showError("Вы не ввели имя хоста");
+            ShowBox.showError(new TranslationTextComponent("error.input.notentered", new TranslationTextComponent("hostname")));
             return false;
         }
         if (port.getText().isEmpty()) {
-            ShowBox.showError("Вы не ввели порт");
+            ShowBox.showError(new TranslationTextComponent("error.input.notentered", new TranslationTextComponent("port")));
             return false;
         }
         if (userName.getText().isEmpty()) {
-            ShowBox.showError("Вы не ввели имя пользователя");
+            ShowBox.showError(new TranslationTextComponent("error.input.notentered", new TranslationTextComponent("username")));
             return false;
         }
         if (password.getText().isEmpty()) {
-            ShowBox.showError("Вы не ввели пароль");
+            ShowBox.showError(new TranslationTextComponent("error.input.notentered", new TranslationTextComponent("password")));
             return false;
         }
 

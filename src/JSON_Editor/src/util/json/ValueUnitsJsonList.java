@@ -15,12 +15,12 @@ public class ValueUnitsJsonList {
 
     protected TypeUnit type;
 
-    public ValueUnitsJsonList() {
-    }
-
+    public ValueUnitsJsonList() {}
     public ValueUnitsJsonList(char[] chStr, int i) throws JsonException {
         if (chStr.length < 2) {
-            chStr = new char[]{'{', '}'};
+            this.value = new ArrayList<>();
+            this.type  = TypeUnit.UNIT;
+            return;
         }
         switch (chStr[i]) {
             case '{':
@@ -34,28 +34,20 @@ public class ValueUnitsJsonList {
         }
     }
 
+    public ValueUnitsJsonList(TypeUnit type){
+        this.value = new ArrayList<>();
+        this.type = type;
+    }
+
     public ValueUnitsJsonList(List<? extends IUnitJson> value, TypeUnit type) {
         if (value == null) {
-            this.value = null;
+            this.value = new ArrayList<>();
         } else {
             this.value = value.stream()
                     .map(unit -> (IUnitJson)unit)
                     .collect(Collectors.toList());
         }
         this.type = type;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ValueUnitsJsonList that = (ValueUnitsJsonList) o;
-        return Objects.equals(value, that.value) && type == that.type;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value, type);
     }
 
     public int unitsInterpreter(char[] chStr, int i) {
@@ -209,6 +201,28 @@ public class ValueUnitsJsonList {
         return null;
     }
 
+    public IUnitJson get(String name) throws JsonException {
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+
+        if (this.value == null) {
+            return null;
+        }
+
+        int size = this.value.size();
+
+        for (int i = 0; i < size; i++) {
+            IUnitJson unit = this.value.get(i);
+            String unitName = unit.getName();
+
+            if (name.equals(unitName)) {
+                return unit;
+            }
+        }
+
+        return null;
+    }
 
     public IUnitJson get(int[] indexes) {
         List<IUnitJson> valueList = this.value;
@@ -248,6 +262,27 @@ public class ValueUnitsJsonList {
         throw new RuntimeException("Unable to set");
     }
 
+    public void delete(int[] indexes) {
+        List<IUnitJson> valueList = this.value;
+        IUnitJson tempElementUnit;
+        for (int i = 0; i < indexes.length; ++i) {
+            int index = indexes[i];
+            if (index >= 0 && index < valueList.size()) {
+                if (i == indexes.length - 1) {
+                    valueList.remove(index);
+                    return;
+                }
+                tempElementUnit = valueList.get(index);
+                if (tempElementUnit.getTypeValue() == IUnitJson.TypeValue.UNITS_ARRAY) {
+                    valueList = tempElementUnit.getValueList();
+                } else {
+                    valueList = null;
+                }
+            } else throw new RuntimeException("Invalid index");
+        }
+        throw new RuntimeException("Unable to delete");
+    }
+
     private List<Integer> findingElemint(IUnitJson value, IUnitJson unit, Integer i, List<Integer> result) {
         if (unit.getTypeValue() == IUnitJson.TypeValue.UNITS_ARRAY) {
             List<Integer> tempResult = new ArrayList<>(result);
@@ -257,7 +292,6 @@ public class ValueUnitsJsonList {
         }
         return null;
     }
-
 
     public List<IUnitJson> getValue() {
         return value;
@@ -367,9 +401,18 @@ public class ValueUnitsJsonList {
         return String.join("", Collections.nCopies(d, TAB));
     }
 
-    /*public enum TypeValue {
-        UNITS,
-        ARRAY
-    }*/
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ValueUnitsJsonList that = (ValueUnitsJsonList) o;
+        return Objects.equals(value, that.value) && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, type);
+    }
+
 
 }

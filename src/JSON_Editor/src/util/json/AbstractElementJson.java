@@ -59,7 +59,7 @@ public abstract class AbstractElementJson implements IUnitJson {
                     this.typeValue = TypeValue.NUMBER;
                     return ((String) this.value).length() + i - 1;
                 }
-                throw new JsonException("EXPECTED_VALUE", i);
+                throw new JsonException("EXPECTED_VALUE", i /*new JsonException("EXPECTED")*/);
         }
     }
 

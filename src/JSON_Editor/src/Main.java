@@ -10,16 +10,18 @@ import src.config.FilesCfg;
 import src.controller.ConfigureConn;
 import src.manager.Dirs;
 import src.util.FileUtils;
+import src.util.TranslationTextComponent;
 
 import java.io.File;
 import java.util.Objects;
 
 public class Main extends Application {
-
+    public static final String FILENAME_REGEX = "^[^\\\\/:*?\"<>|]*$"; // допустимое имя файла
     public final static File homeDir = new Dirs(FilesCfg.HOME_DIR).getWorkDir();
     public final static File tempDir = new File(homeDir.getAbsolutePath() + File.separator + "temp");
 
     public static void main(String[] args) {
+        TranslationTextComponent.loadLangs();
         launch(args);
     }
 

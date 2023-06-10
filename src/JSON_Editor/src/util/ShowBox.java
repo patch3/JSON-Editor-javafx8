@@ -14,21 +14,18 @@ public class ShowBox {
                 .ifPresent(response -> System.out.println("Нажата кнопка ОК")); //Если ок, то выводим в консоль текст "Нажата кнопка ОК"
     }*/
 
-    public static void showInfo(String title, String textInfo) {
+    public static void showInfo(TranslationTextComponent title, TranslationTextComponent textInfo) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setContentText(textInfo);
+        alert.setTitle(title.toString());
+        alert.setContentText(textInfo.toString());
     }
 
-    public static void showError(String textErr) {
+    public static void showError(TranslationTextComponent textErr) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Ошибка");
-        alert.setHeaderText("Произошла ошибка");
-        alert.setContentText(textErr);
-        //Код ниже позволяет тебе определять, какую кнопку нажал юзер во время ошибки. (Ок или не ок в случае ниже)
-        alert.showAndWait() //Вызываем окно
-                .filter(response -> response == ButtonType.OK) //Проверяем, какая кнопка была нажата
-                .ifPresent(response -> System.out.println("Нажата кнопка ОК")); //Если ок, то выводим в консоль текст "Нажата кнопка ОК"
+        alert.setTitle(new TranslationTextComponent("showbox.error.title").toString());
+        alert.setHeaderText("showbox.error.headerText");
+        alert.setContentText(textErr.toString());
+
     }
 
 

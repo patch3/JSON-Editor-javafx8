@@ -13,9 +13,9 @@ public class Directory extends IDirectory {
     public List<DirectoryElement> elementlist = new ArrayList<>();
     public List<DirectoryElement> jsonFiles = new ArrayList<>();
     public String pathToElement;
+    public boolean isRemote;
     @Nullable
     private File parentDir;
-    public boolean isRemote;
 
     public Directory(File workDir, @Nullable File parent) {
         isRemote = false;

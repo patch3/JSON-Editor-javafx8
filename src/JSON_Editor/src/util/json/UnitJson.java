@@ -63,15 +63,14 @@ public class UnitJson extends AbstractElementJson {
     }
 
 
-
     @Override
     public String getName() {
         return this.name;
     }
 
     @Override
-    public void setName(Object obj){
-        if (obj instanceof String){
+    public void setName(Object obj) {
+        if (obj instanceof String) {
             this.name = (String) obj;
         } else {
             throw new IllegalArgumentException("Ожидался String");

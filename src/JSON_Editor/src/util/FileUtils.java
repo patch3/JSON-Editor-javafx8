@@ -1,9 +1,10 @@
 package src.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.io.File;
+
 public class FileUtils {
     public static String getExtensionByStringHandling(String filename) {
         if (filename != null && filename.contains(".")) {

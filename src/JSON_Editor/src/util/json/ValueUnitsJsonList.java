@@ -2,6 +2,7 @@ package src.util.json;
 
 
 import src.util.Interpreter;
+import src.util.TranslationTextComponent;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,11 +16,13 @@ public class ValueUnitsJsonList {
 
     protected TypeUnit type;
 
-    public ValueUnitsJsonList() {}
+    public ValueUnitsJsonList() {
+    }
+
     public ValueUnitsJsonList(char[] chStr, int i) throws JsonException {
         if (chStr.length < 2) {
             this.value = new ArrayList<>();
-            this.type  = TypeUnit.UNIT;
+            this.type = TypeUnit.UNIT;
             return;
         }
         switch (chStr[i]) {
@@ -30,11 +33,11 @@ public class ValueUnitsJsonList {
                 this.arrayInterpreter(chStr, i);
                 break;
             default:
-                throw new JsonException("UNEXPECTED_OPEN_CHAR", i);
+                throw new JsonException(new TranslationTextComponent("error.json.unexp.open.char").toString());
         }
     }
 
-    public ValueUnitsJsonList(TypeUnit type){
+    public ValueUnitsJsonList(TypeUnit type) {
         this.value = new ArrayList<>();
         this.type = type;
     }
@@ -44,7 +47,7 @@ public class ValueUnitsJsonList {
             this.value = new ArrayList<>();
         } else {
             this.value = value.stream()
-                    .map(unit -> (IUnitJson)unit)
+                    .map(unit -> (IUnitJson) unit)
                     .collect(Collectors.toList());
         }
         this.type = type;
@@ -172,15 +175,16 @@ public class ValueUnitsJsonList {
         }
         throw new JsonException("UNEXPECTED_ENDING");
     }
+
     public List<Integer> indexOf(IUnitJson value, List<Integer> result) {
         if (this.value == null) return null;
         int size = this.value.size();
         int hash = value.hashCode();
 
-        if (this.type == value.getTypeUnit()){
+        if (this.type == value.getTypeUnit()) {
             for (int i = 0; i < size; ++i) {
                 IUnitJson unit = this.value.get(i);
-                if (unit.hashCode() == hash){
+                if (unit.hashCode() == hash) {
                     result.add(i);
                     return result;
                 }

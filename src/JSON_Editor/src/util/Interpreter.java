@@ -43,7 +43,7 @@ public class Interpreter {
         throw new SyntaxException("End of String not found of index " + i);
     }
 
-    public static String numberStr(char[] chStr, int i){
+    public static String numberStr(char[] chStr, int i) {
         if (!(Character.isDigit(chStr[i]) || chStr[i] == '-')) {
             throw new SyntaxException("Expected start of number at index '" + i + "'");
         }
@@ -61,7 +61,7 @@ public class Interpreter {
                 numBuilder.append(c);
                 hasDigit = true;
             } else if (hasDigit && c == '.' && !hasDecimalPoint) {
-                if (Character.isDigit(chStr[i+1])){
+                if (Character.isDigit(chStr[i + 1])) {
                     throw new JsonException("A number was expected after the dot", i);
                 }
                 numBuilder.append(c);

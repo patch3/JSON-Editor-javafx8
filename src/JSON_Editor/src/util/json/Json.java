@@ -16,10 +16,8 @@ public class Json extends ValueUnitsJsonList {
         this(FileUtils.readFile(fileJson.getAbsolutePath()));
     }
 
-    public Json(String str) {
+    public Json(String str) throws JsonException {
         super(str.toCharArray(), Interpreter.skipChar(str.toCharArray(), 0));
-
-
     }
 
     public Json(List<? extends IUnitJson> obj, TypeUnit type) {
@@ -29,7 +27,7 @@ public class Json extends ValueUnitsJsonList {
 
     public int[] indexOf(IUnitJson obj) {
         return Convert.toIntArray(
-                super.indexOf(obj,  new ArrayList<>())
+                super.indexOf(obj, new ArrayList<>())
         );
     }
 

@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import src.Main;
@@ -28,8 +29,7 @@ public class ConfigureConn {
     public static String savedHostname;
     public static int savedPort;
     public static String savedUsername;
-
-
+    public static String savedPassword;
     @FXML
     private AnchorPane configureConnScene;
     @FXML
@@ -44,9 +44,19 @@ public class ConfigureConn {
     private TextField userName;
     @FXML
     private TextField password;
-    public static String savedPassword;
+    @FXML
+    private Label titleLabel;
+    @FXML
+    private Label hostNameLabel;
+    @FXML
+    private Label portLabel;
+    @FXML
+    private Label userNameLabel;
+    @FXML
+    private Label passwordLabel;
 
     public static void loadSettingsFromFile() {
+
         try {
             Json json = new Json(settingsFile);
 
@@ -78,7 +88,22 @@ public class ConfigureConn {
         }
     }
 
+    private void setText() {
+        saveButton.setText(new TranslationTextComponent("button.save").toString());
+        checkButton.setText(new TranslationTextComponent("button.check.connection").toString());
+        hostName.setPromptText(new TranslationTextComponent("hostname").toString());
+        port.setPromptText(new TranslationTextComponent("port").toString());
+        userName.setPromptText(new TranslationTextComponent("username").toString());
+        password.setPromptText(new TranslationTextComponent("password").toString());
+        titleLabel.setText(new TranslationTextComponent("configure").toString());
+        hostNameLabel.setText(new TranslationTextComponent("hostname").toString());
+        portLabel.setText(new TranslationTextComponent("port").toString());
+        userNameLabel.setText(new TranslationTextComponent("username").toString());
+        passwordLabel.setText(new TranslationTextComponent("password").toString());
+    }
+
     public void initialize() {
+        setText();
         saveButton.setOnAction(this::eventClickOnSave);
         checkButton.setOnAction(this::eventClickOnCheck);
         port.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -150,7 +175,7 @@ public class ConfigureConn {
     }
 
 
-    private boolean checkInputCorrect(){
+    private boolean checkInputCorrect() {
         if (hostName.getText().isEmpty()) {
             ShowBox.showError(new TranslationTextComponent("error.input.notentered", new TranslationTextComponent("hostname")));
             return false;

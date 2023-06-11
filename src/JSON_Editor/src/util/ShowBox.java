@@ -1,7 +1,6 @@
 package src.util;
 
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 
 public class ShowBox {
     /*public static boolean showQuestion(){

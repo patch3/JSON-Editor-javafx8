@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class AbstractElementJson implements IUnitJson {
-    
+
     private static int countId = Integer.MIN_VALUE;
 
     public final TypeUnit TYPE_UNIT;
@@ -127,13 +127,6 @@ public abstract class AbstractElementJson implements IUnitJson {
         return typeValue;
     }
 
-
-    @Override
-    public void setValue(IUnitJson obj) {
-        this.value = obj.getValue();
-        this.typeValue = obj.getTypeValue();
-    }
-
     @Override
     public void setValue(Object value, TypeValue typeValue) {
         this.typeValue = typeValue;
@@ -187,5 +180,11 @@ public abstract class AbstractElementJson implements IUnitJson {
     @Override
     public Object getValue() {
         return value;
+    }
+
+    @Override
+    public void setValue(IUnitJson obj) {
+        this.value = obj.getValue();
+        this.typeValue = obj.getTypeValue();
     }
 }

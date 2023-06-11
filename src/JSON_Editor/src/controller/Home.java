@@ -4,12 +4,14 @@ package src.controller;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.sun.istack.internal.Nullable;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,6 +19,7 @@ import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -45,6 +48,13 @@ import static src.Main.FILENAME_REGEX;
 
 public class Home {
     @FXML
+    public TreeView<IDirectory> directoryTreeView;
+    @FXML
+    public TreeView<IUnitJson> treeView;
+    public Json json;
+    public boolean jsonIsRemote = false;
+    public String remotePath;
+    @FXML
     private AnchorPane scene;
     @FXML
     private MenuItem createLocal;
@@ -68,14 +78,6 @@ public class Home {
     private MenuItem exitFile;
     @FXML
     private MenuItem exitProg;
-
-    @FXML
-    public TreeView<IDirectory> directoryTreeView;
-    @FXML
-    public TreeView<IUnitJson> treeView;
-
-    public Json json;
-
     @FXML
     private TextField nameUnitTextField;
     @FXML
@@ -84,16 +86,11 @@ public class Home {
     private CheckBox numCheckBox;
     @FXML
     private Button saveButton;
-
     @FXML
     private Menu language;
     @FXML
     private Button cancelButton;
-    public boolean jsonIsRemote = false;
     private IUnitJson unitJson;
-    public String remotePath;
-
-
     @Nullable
     private File workFile;
     @Nullable
@@ -106,13 +103,43 @@ public class Home {
     private MenuButton infoMenu;
     @FXML
     private MenuButton viewMenu;
+    @FXML
+    private MenuItem infoThisAppItem;
+    @FXML
+    private MenuItem usersGuideItem;
+    @FXML
+    private RadioMenuItem textEquivalentCheck;
+    @FXML
+    private Label nameLabel;
+    @FXML
+    private Label valueLabel;
 
+    private TextArea textAreaJson;
+
+    public static Node replace(Pane parent, Node whatReplace, Node replaceTo) {
+        if (parent != null && whatReplace != null && replaceTo != null) {
+            int index = parent.getChildren().indexOf(whatReplace);
+            if (index != -1) {
+                // Заменяем ноду и устанавливаем ее на место старой ноды
+                replaceTo.setLayoutX(whatReplace.getLayoutX());
+                replaceTo.setLayoutY(whatReplace.getLayoutY());
+                replaceTo.setTranslateX(whatReplace.getTranslateX());
+                replaceTo.setTranslateY(whatReplace.getTranslateY());
+                replaceTo.setRotate(whatReplace.getRotate());
+                replaceTo.setScaleX(whatReplace.getScaleX());
+                replaceTo.setScaleY(whatReplace.getScaleY());
+                replaceTo.setVisible(true);
+                parent.getChildren().set(index, replaceTo);
+                return replaceTo;
+            }
+        }
+        return null;
+    }
 
     @FXML
     public void initialize() {
         this.setText();
-        
-        
+
         this.openLocal.setOnAction(this::eventClickOpen);
         this.createLocal.setOnAction(event -> eventClickCreateLocal(event, null));
         this.configureConn.setOnAction(this::eventClickConfigureConn);
@@ -122,11 +149,11 @@ public class Home {
         this.disconnect.setOnAction(event -> disconnect());
 
         ToggleGroup group = new ToggleGroup();
-        for (File f : TranslationTextComponent.translates){
+        for (File f : TranslationTextComponent.translates) {
             RadioMenuItem item = new RadioMenuItem(f.getName());
             item.setOnAction(event -> onChangeLanguage(item));
             item.setToggleGroup(group);
-            if (item.getText().equals(TranslationTextComponent.currentTranslation.getName())){
+            if (item.getText().equals(TranslationTextComponent.currentTranslation.getName())) {
                 group.selectToggle(item);
             }
             language.getItems().add(item);
@@ -137,8 +164,7 @@ public class Home {
         this.directoryTreeView.setOnMouseClicked(this::onDirectoryTreeViewClick);
         this.directoryTreeView.setOnContextMenuRequested(this::eventDirectoryTreeViewContextMenuRequest);
 
-        //this.treeView.setEditable(true);
-        //this.treeView.setShowRoot(false);
+
         this.treeView.setCellFactory(param -> createTextFieldTreeCell());
         this.treeView.setOnEditCommit(this::onEditCommit);
         this.treeView.setOnMouseClicked(this::onMauseClickTreeView);
@@ -147,6 +173,36 @@ public class Home {
         /* панель изменения элементов json */
         this.saveButton.setOnAction(this::onActionSaveButton);
         this.cancelButton.setOnAction(this::onActionCancelButton);
+
+
+        this.textEquivalentCheck.setOnAction(this::onActionTextEquivalentCheck);
+
+
+        exitProg.setOnAction(event -> Platform.exit());
+        exitFile.setOnAction(event -> {
+            clearTreeView(treeView);
+            json = null;
+        });
+        exitFolder.setOnAction(event -> {
+            clearTreeView(treeView);
+            clearTreeView(directoryTreeView);
+            json = null;
+        });
+    }
+
+    private void onActionTextEquivalentCheck(ActionEvent event) {
+        if (!this.textEquivalentCheck.isSelected()) { // если при нажатии флажок не нажат
+            this.treeView = (TreeView<IUnitJson>) replace((Pane) this.treeView.getParent(), this.textAreaJson, this.treeView);
+            return;
+        }
+        // Выделен
+        try {
+            this.json = new Json(this.textAreaJson.getText());
+        } catch (JsonException ex) {
+            ShowBox.showError(new TranslationTextComponent("error.json.change.text", ex.getMessage()));
+        }
+        this.textAreaJson = (TextArea) replace((Pane) this.treeView.getParent(), this.treeView, new TextArea());
+        showJson(this.json);
     }
 
     private void setText() {
@@ -161,39 +217,49 @@ public class Home {
         exitProg.setText(new TranslationTextComponent("menu_item.exit.global").toString());
         openLocal.setText(new TranslationTextComponent("menu_item.open.local").toString());
         configureConn.setText(new TranslationTextComponent("menu_item.configure").toString());
+        infoThisAppItem.setText(new TranslationTextComponent("menu_item.information.about.this.app").toString());
+        usersGuideItem.setText(new TranslationTextComponent("menu_item.information.guide").toString());
         language.setText(new TranslationTextComponent("menu.language").toString());
         fileMenu.setText(new TranslationTextComponent("menu.file").toString());
         connectMenu.setText(new TranslationTextComponent("menu.connect").toString());
         infoMenu.setText(new TranslationTextComponent("menu.info").toString());
         viewMenu.setText(new TranslationTextComponent("menu.view").toString());
+        nameLabel.setText(new TranslationTextComponent("name").toString());
+        nameUnitTextField.setPromptText(new TranslationTextComponent("name").toString());
+        valueLabel.setText(new TranslationTextComponent("value").toString());
+        textEquivalentCheck.setText(new TranslationTextComponent("menu_item.view.text_equivalent").toString());
+        numCheckBox.setText(new TranslationTextComponent("number").toString());
+        saveButton.setText(new TranslationTextComponent("button.save").toString());
+        cancelButton.setText(new TranslationTextComponent("button.cancel").toString());
     }
 
     private void onChangeLanguage(RadioMenuItem item) {
-        for (File f : TranslationTextComponent.translates){
+        for (File f : TranslationTextComponent.translates) {
             String name = item.getText();
-            if (name.equals(f.getName())){
+            if (name.equals(f.getName())) {
                 TranslationTextComponent.currentTranslation = f;
             }
         }
         setText();
     }
 
-
-
+    /**
+     * Создания контекстного меню при правом клике по дереву json
+     */
     private void eventTreeViewContextMenuRequest(ContextMenuEvent event) {
         TreeItem<IUnitJson> selectedItem = treeView.getSelectionModel().getSelectedItem();
 
         ContextMenu menu = new ContextMenu();
 
-        MenuItem deleteMenuItem          = new MenuItem(new TranslationTextComponent("delete").toString());
-        MenuItem addUnitJsonMenuItem     = new MenuItem(new TranslationTextComponent("context_menu.add_unit").toString());
+        MenuItem deleteMenuItem = new MenuItem(new TranslationTextComponent("delete").toString());
+        MenuItem addUnitJsonMenuItem = new MenuItem(new TranslationTextComponent("context_menu.add_unit").toString());
         MenuItem addUnitListJsonMenuItem = new MenuItem(new TranslationTextComponent("context_menu.add_unit_list").toString());
-        MenuItem addArrayListMenuItem    = new MenuItem(new TranslationTextComponent("context_menu.add_array_list").toString());
+        MenuItem addArrayListMenuItem = new MenuItem(new TranslationTextComponent("context_menu.add_array_list").toString());
 
-        deleteMenuItem.setOnAction(event1 -> eventDeleteJsonUnitOnAction(event1, selectedItem));
-        addUnitJsonMenuItem.setOnAction(event1 -> eventAddUnitOnAction(event1, selectedItem));
-        addUnitListJsonMenuItem.setOnAction(event1 -> eventAddUnitListOnAction(event1, selectedItem));
-        addArrayListMenuItem.setOnAction(event1 -> eventAddArrayListOnAction(event1, selectedItem));
+        deleteMenuItem.setOnAction(event1 -> eventDeleteJsonUnitOnAction(event1, selectedItem));       // Удалить элемент
+        addUnitJsonMenuItem.setOnAction(event1 -> eventAddUnitOnAction(event1, selectedItem));         // Создание unit
+        addUnitListJsonMenuItem.setOnAction(event1 -> eventAddUnitListOnAction(event1, selectedItem)); // Создать список units
+        addArrayListMenuItem.setOnAction(event1 -> eventAddArrayListOnAction(event1, selectedItem));   // Создать массив
 
 
         if (treeView.getRoot() == null) {
@@ -216,82 +282,31 @@ public class Home {
         menu.show(scene.getScene().getWindow(), event.getScreenX(), event.getScreenY());
     }
 
-    private void eventAddArrayListOnAction(ActionEvent event1, TreeItem<IUnitJson> selectedItem) {
+    private void eventAddEmptyUnit(ActionEvent event, TreeItem<IUnitJson> selectedItem, String emptyUnitLabel) {
         IUnitJson parentUnit = selectedItem.getValue();
-        if (parentUnit.getTypeValue() != IUnitJson.TypeValue.UNITS_ARRAY) {
-            throw new RuntimeException("List expected");
-        }
+        ValueUnitsJsonList parentValue = (ValueUnitsJsonList) parentUnit.getValue();
         IUnitJson emptyUnit;
-        if (((ValueUnitsJsonList)parentUnit.getValue()).getType() == TypeUnit.UNIT) {
+
+        if (parentValue.getType() == TypeUnit.UNIT) {
             emptyUnit = new UnitJson(
-                    new TranslationTextComponent("unit.new_unit").toString(),
+                    new TranslationTextComponent(emptyUnitLabel).toString(),
                     new ValueUnitsJsonList(TypeUnit.UNIT),
                     IUnitJson.TypeValue.UNITS_ARRAY
             );
         } else {
             emptyUnit = new UnitJson(
-                    String.format("[%s]",parentUnit.getValueList().size()),
+                    String.format("[%s]", parentUnit.getValueList().size()),
                     new ValueUnitsJsonList(TypeUnit.UNIT),
                     IUnitJson.TypeValue.UNITS_ARRAY
             );
-        }
-        IUnitJson newParentUnit = parentUnit;
-        newParentUnit.getValueList().add(emptyUnit);
-        this.json.set(this.json.indexOf(parentUnit), newParentUnit);
-        parentUnit.getValueList().add(emptyUnit);
-
-        TreeItem<IUnitJson> treeItem = new TreeItem<>(emptyUnit);
-
-        selectedItem.setValue(newParentUnit);
-        selectedItem.getChildren().add(treeItem);
-        this.treeView.refresh();
-    }
-
-    private void eventAddUnitListOnAction(ActionEvent event1, TreeItem<IUnitJson> selectedItem) {
-        IUnitJson parentUnit = selectedItem.getValue();
-        if (parentUnit.getTypeValue() != IUnitJson.TypeValue.UNITS_ARRAY) {
-            throw new RuntimeException("List expected");
-        }
-        IUnitJson emptyUnit;
-        if (((ValueUnitsJsonList)parentUnit.getValue()).getType() == TypeUnit.UNIT) {
-            emptyUnit = new UnitJson(
-                    new TranslationTextComponent("unit.new_unit").toString(),
-                    new ValueUnitsJsonList(TypeUnit.UNIT),
-                    IUnitJson.TypeValue.UNITS_ARRAY
-            );
-        } else {
-            emptyUnit = new UnitJson(
-                    String.format("[%s]",parentUnit.getValueList().size()),
-                    new ValueUnitsJsonList(TypeUnit.UNIT),
-                    IUnitJson.TypeValue.UNITS_ARRAY
-            );
-        }
-        IUnitJson newParentUnit = parentUnit;
-        newParentUnit.getValueList().add(emptyUnit);
-        this.json.set(this.json.indexOf(parentUnit), newParentUnit);
-        parentUnit.getValueList().add(emptyUnit);
-
-        TreeItem<IUnitJson> treeItem = new TreeItem<>(emptyUnit);
-
-        selectedItem.setValue(newParentUnit);
-        selectedItem.getChildren().add(treeItem);
-        this.treeView.refresh();
-
-    }
-
-    private void eventAddUnitOnAction(ActionEvent event, TreeItem<IUnitJson> selectedItem) {
-        IUnitJson emptyUnit;
-        IUnitJson parentUnit = selectedItem.getValue();
-        if (((ValueUnitsJsonList)parentUnit.getValue()).getType() == TypeUnit.UNIT) {
-            emptyUnit = new UnitJson(new TranslationTextComponent("unit.new_unit").toString(), "", IUnitJson.TypeValue.STRING);
-        } else {
-            emptyUnit = new UnitJson(String.format("[%s]",parentUnit.getValueList().size()), "", IUnitJson.TypeValue.STRING);
         }
 
         if (selectedItem == this.treeView.getRoot()) {
-
+            this.json.getValue().add(emptyUnit);
+            this.treeView.getRoot().getChildren().add(new TreeItem<>(emptyUnit));
+            this.treeView.refresh();
+            return;
         }
-
 
         if (parentUnit.getTypeValue() != IUnitJson.TypeValue.UNITS_ARRAY) {
             throw new RuntimeException("List expected");
@@ -308,9 +323,19 @@ public class Home {
         this.treeView.refresh();
     }
 
+    private void eventAddArrayListOnAction(ActionEvent event, TreeItem<IUnitJson> selectedItem) {
+        eventAddEmptyUnit(event, selectedItem, "unit.new_array_list");
+    }
 
+    private void eventAddUnitListOnAction(ActionEvent event, TreeItem<IUnitJson> selectedItem) {
+        eventAddEmptyUnit(event, selectedItem, "unit.new_unit_list");
+    }
 
-    private void eventDeleteJsonUnitOnAction(ActionEvent event, TreeItem<IUnitJson> selectedItem){
+    private void eventAddUnitOnAction(ActionEvent event, TreeItem<IUnitJson> selectedItem) {
+        eventAddEmptyUnit(event, selectedItem, "unit.new_unit");
+    }
+
+    private void eventDeleteJsonUnitOnAction(ActionEvent event, TreeItem<IUnitJson> selectedItem) {
         if (selectedItem == this.treeView.getRoot()) {
             this.json = null;
             this.treeView.getRoot().getChildren().clear();
@@ -326,33 +351,9 @@ public class Home {
         treeView.refresh(); // Обновление TreeView
     }
 
-
-
-    private void clearTreeView(TreeView<?> treeView){
+    private void clearTreeView(TreeView<?> treeView) {
         treeView.setRoot(null);
         treeView.refresh();
-    }
-
-    private TreeItem<IUnitJson> getParentTreeItem(int[] indexes) {
-        TreeItem<IUnitJson> tempElementItem = this.treeView.getTreeItem(0);
-        ObservableList<TreeItem<IUnitJson>> treeItemList = tempElementItem.getChildren();
-        for (int i = 0; i < indexes.length; ++i) {
-            int index = indexes[i];
-            if (index >= 0 && index < treeItemList.size()) {
-                if (i == indexes.length - 1) {
-                    return tempElementItem;
-                }
-                tempElementItem = treeItemList.get(index);
-                 if (tempElementItem.getChildren() != null) {
-                    treeItemList = tempElementItem.getChildren();
-                } else {
-                    throw new RuntimeException("Child list is null");
-                }
-            } else {
-                throw new RuntimeException("Invalid index");
-            }
-        }
-        throw new RuntimeException("Unable to get parent");
     }
 
 
@@ -387,28 +388,27 @@ public class Home {
         }
         menu.show(scene.getScene().getWindow(), event.getScreenX(), event.getScreenY());
     }
-    private void eventDeleteJson(ActionEvent event){
-        TreeItem<IDirectory> selectedItem = directoryTreeView.getSelectionModel().getSelectedItem();
-        DirectoryElement selectedElement = (DirectoryElement) selectedItem.getValue();
 
-        if (selectedElement.isRemote){
-            try {
-                deleteJsonRemote(selectedElement.pathToElement);
-                selectedItem.getParent().getChildren().remove(selectedItem);
-                directoryTreeView.refresh();
-            }catch (Exception e){
-                ShowBox.showError(new TranslationTextComponent("error.unabletodelete.file", e.getMessage()));
-                e.printStackTrace();
-            }
-        }else {
-            if (new File(selectedElement.pathToElement).delete()){
-                ShowBox.showInfo(new TranslationTextComponent("success"), new TranslationTextComponent("succes.file.deleted"));
-                selectedItem.getParent().getChildren().remove(selectedItem);
-                directoryTreeView.refresh();
-            }else {
-                ShowBox.showError(new TranslationTextComponent("error.unabletodelete.file", selectedElement.pathToElement));
+    private TreeItem<IUnitJson> getParentTreeItem(int[] indexes) {
+        TreeItem<IUnitJson> tempElementItem = this.treeView.getTreeItem(0);
+        ObservableList<TreeItem<IUnitJson>> treeItemList = tempElementItem.getChildren();
+        for (int i = 0; i < indexes.length; ++i) {
+            int index = indexes[i];
+            if (index >= 0 && index < treeItemList.size()) {
+                if (i == indexes.length - 1) {
+                    return tempElementItem;
+                }
+                tempElementItem = treeItemList.get(index);
+                if (tempElementItem.getChildren() != null) {
+                    treeItemList = tempElementItem.getChildren();
+                } else {
+                    throw new RuntimeException("Child list is null");
+                }
+            } else {
+                throw new RuntimeException("Invalid index");
             }
         }
+        throw new RuntimeException("Unable to get parent");
     }
 
     private void deleteJsonRemote(String pathToElement) throws SftpException, JSchException {
@@ -418,12 +418,42 @@ public class Home {
         client.disconnect();
     }
 
-
-    private void eventCreateDirectory(ActionEvent event){
+    private void eventDeleteJson(ActionEvent event) {
         TreeItem<IDirectory> selectedItem = directoryTreeView.getSelectionModel().getSelectedItem();
         DirectoryElement selectedElement = (DirectoryElement) selectedItem.getValue();
 
-        if (selectedElement.isRemote){
+        if (selectedElement.isRemote) {
+            try {
+                deleteJsonRemote(selectedElement.pathToElement);
+                selectedItem.getParent().getChildren().remove(selectedItem);
+                directoryTreeView.refresh();
+            } catch (Exception e) {
+                ShowBox.showError(new TranslationTextComponent("error.unabletodelete.file", e.getMessage()));
+                e.printStackTrace();
+            }
+        } else {
+            if (new File(selectedElement.pathToElement).delete()) {
+                ShowBox.showInfo(new TranslationTextComponent("success"), new TranslationTextComponent("succes.file.deleted"));
+                selectedItem.getParent().getChildren().remove(selectedItem);
+                directoryTreeView.refresh();
+            } else {
+                ShowBox.showError(new TranslationTextComponent("error.unabletodelete.file", selectedElement.pathToElement));
+            }
+        }
+    }
+
+    private void createRemoteDirectory(String remotePath, String dirName) throws JSchException, SftpException {
+        SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
+        client.connect();
+        client.createDirectory(remotePath + File.separator + dirName);
+        client.disconnect();
+    }
+
+    private void eventCreateDirectory(ActionEvent event) {
+        TreeItem<IDirectory> selectedItem = directoryTreeView.getSelectionModel().getSelectedItem();
+        DirectoryElement selectedElement = (DirectoryElement) selectedItem.getValue();
+
+        if (selectedElement.isRemote) {
             Stage stage = new Stage();
             AnchorPane pane = new AnchorPane();
             VBox box = new VBox();
@@ -447,10 +477,10 @@ public class Home {
                                     directoryTreeView.getSelectionModel().getSelectedItem().getValue(),
                                     false
                             )));
-                }catch (Exception e){
+                } catch (Exception e) {
                     ShowBox.showError(new TranslationTextComponent("error.create.remote.file", e.getMessage()));
                     e.printStackTrace();
-                }finally {
+                } finally {
                     stage.close();
                     directoryTreeView.refresh();
                 }
@@ -461,7 +491,7 @@ public class Home {
 
             stage.setScene(new Scene(pane));
             stage.show();
-        }else {
+        } else {
             DirectoryChooser chooser = new DirectoryChooser();
             chooser.setInitialDirectory(new File(selectedElement.pathToElement));
             try {
@@ -473,14 +503,7 @@ public class Home {
         }
     }
 
-    private void createRemoteDirectory(String remotePath, String dirName) throws JSchException, SftpException {
-        SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
-        client.connect();
-        client.createDirectory(remotePath + File.separator + dirName);
-        client.disconnect();
-    }
-
-    private void eventDeleteDirectory(ActionEvent event){
+    private void eventDeleteDirectory(ActionEvent event) {
         TreeItem<IDirectory> selectedItem = directoryTreeView.getSelectionModel().getSelectedItem();
         DirectoryElement selectedItemValue = (DirectoryElement) selectedItem.getValue();
 
@@ -489,12 +512,19 @@ public class Home {
             client.connect();
             client.deleteDirectory(selectedItemValue.pathToElement);
             directoryTreeView.getSelectionModel().getSelectedItem().getParent().getChildren().remove(directoryTreeView.getSelectionModel().getSelectedItem());
-        }catch (Exception e){
+        } catch (Exception e) {
             ShowBox.showError(new TranslationTextComponent("error.delete.remote.dir", e.getMessage()));
-        }finally {
+        } finally {
             client.disconnect();
             directoryTreeView.refresh();
         }
+    }
+
+    private void createRemoteJsonFile(String remotePath, String fileName) throws JSchException, SftpException {
+        SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
+        client.connect();
+        client.createFile(remotePath + File.separator + fileName + ".json");
+        client.disconnect();
     }
 
     private void eventCreateJson(ActionEvent event, DirectoryElement element) {
@@ -520,12 +550,12 @@ public class Home {
                                     element.pathToElement.replace("\\", "/") + File.separator + field.getText() + ".json",
                                     directoryTreeView.getSelectionModel().getSelectedItem().getValue(),
                                     true
-                             )));
+                            )));
                     ShowBox.showInfo(new TranslationTextComponent("success"), new TranslationTextComponent("success.file.created"));
-                }catch (Exception e){
+                } catch (Exception e) {
                     ShowBox.showError(new TranslationTextComponent("error.create.remote.file", e.getMessage()));
                     e.printStackTrace();
-                }finally {
+                } finally {
                     stage.close();
                     directoryTreeView.refresh();
                 }
@@ -541,40 +571,6 @@ public class Home {
         }
     }
 
-    private void createRemoteJsonFile(String remotePath, String fileName) throws JSchException, SftpException {
-        SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
-        client.connect();
-        client.createFile(remotePath + File.separator + fileName + ".json");
-        client.disconnect();
-    }
-
-
-    private void eventSaveFile(ActionEvent event) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(workFile))) {
-            System.err.println(json.toString());
-            writer.write(json.toString());
-            writer.flush();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (jsonIsRemote) {
-            SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
-            try {
-                client.connect();
-                System.err.println(remotePath + " : " + workFile.getAbsolutePath());
-                client.uploadFile(remotePath.substring(1), workFile.getAbsolutePath());
-                workFile.delete();
-            } catch (Exception e) {
-                ShowBox.showError(new TranslationTextComponent("error.load.remote.file", e.getMessage()));
-                e.printStackTrace();
-            } finally {
-                client.disconnect();
-                jsonIsRemote = false;
-                remotePath = null;
-            }
-        }
-    }
     private void eventClickOpenRemoteFolder(Event event) {
         SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
         try {
@@ -690,27 +686,47 @@ public class Home {
         }
     }
 
+    private void eventSaveFile(ActionEvent event) {
+        if (this.json == null) return;
 
-    private void eventClickOpenLocalFolder(Event event) {
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("");
+        if (this.textEquivalentCheck.isSelected()) {
+            if (this.textAreaJson.getText().isEmpty()) {
+                return;
+            }
+            try {
+                this.json = new Json(textAreaJson.getText());
+            } catch (JsonException e) {
+                ShowBox.showError(new TranslationTextComponent("error.json.load", e.getMessage()));
+            }
 
-        workDirectory = chooser.showDialog(scene.getScene().getWindow());
-
-        if (workDirectory == null) return;
-        Directory dir = new Directory(workDirectory, null);
-        TreeItem<IDirectory> rootItem = new TreeItem<>(dir);
-        for (DirectoryElement directoryElement : dir.elementlist) {
-            TreeItem<IDirectory> item = new TreeItem<>(directoryElement);
-            rootItem.getChildren().add(item);
         }
-        for (DirectoryElement element : dir.jsonFiles) {
-            TreeItem<IDirectory> item = new TreeItem<>(element);
-            rootItem.getChildren().add(item);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(workFile))) {
+            System.err.println(json.toString());
+            writer.write(json.toString());
+            writer.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        directoryTreeView.setRoot(rootItem);
+        if (jsonIsRemote) {
+            SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
+            try {
+                client.connect();
+                System.err.println(remotePath + " : " + workFile.getAbsolutePath());
+                client.uploadFile(remotePath.substring(1), workFile.getAbsolutePath());
+                workFile.delete();
+            } catch (Exception e) {
+                ShowBox.showError(new TranslationTextComponent("error.load.remote.file", e.getMessage()));
+                e.printStackTrace();
+            } finally {
+                client.disconnect();
+                jsonIsRemote = false;
+                remotePath = null;
+            }
+        }
     }
 
+    
     private void eventClickCreateLocal(Event event, @Nullable File initialPath) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("");
@@ -729,10 +745,6 @@ public class Home {
                 write.write("{\n\t\n}");
                 write.flush();
                 write.close();
-            } else {
-                if (workFile.exists()) {
-                    // File already exists
-                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -786,29 +798,25 @@ public class Home {
         treeView.refresh(); // Обновление TreeView
     }
 
+    private void eventClickOpenLocalFolder(Event event) {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("");
 
+        workDirectory = chooser.showDialog(scene.getScene().getWindow());
 
-    public void showJson(Json json) {
-        List<IUnitJson> unitList = json.getValue();
-        UnitJson rootUnit;
-        if (json.getType() == TypeUnit.UNIT){
-            rootUnit = new UnitJson("[UnitList]", null, IUnitJson.TypeValue.UNITS_ARRAY);
-        } else {
-            rootUnit = new UnitJson("[ArrayList]", null, IUnitJson.TypeValue.UNITS_ARRAY);
+        if (workDirectory == null) return;
+        Directory dir = new Directory(workDirectory, null);
+        TreeItem<IDirectory> rootItem = new TreeItem<>(dir);
+        for (DirectoryElement directoryElement : dir.elementlist) {
+            TreeItem<IDirectory> item = new TreeItem<>(directoryElement);
+            rootItem.getChildren().add(item);
         }
-        TreeItem<IUnitJson> rootItem = new TreeItem<>(rootUnit);
+        for (DirectoryElement element : dir.jsonFiles) {
+            TreeItem<IDirectory> item = new TreeItem<>(element);
+            rootItem.getChildren().add(item);
+        }
         rootItem.setExpanded(true);
-        if (unitList != null) {
-            for (IUnitJson iUnitJson : unitList) {
-                TreeItem<IUnitJson> item = new TreeItem<>(iUnitJson);
-                if (iUnitJson.getValue() instanceof ValueUnitsJsonList) {
-                    item.getChildren().add(recursionShowJson(iUnitJson));
-                }
-                rootItem.getChildren().add(item);
-            }
-        }
-
-        treeView.setRoot(rootItem);
+        directoryTreeView.setRoot(rootItem);
     }
 
     private TreeItem<IUnitJson> recursionShowJson(IUnitJson obj) {
@@ -841,17 +849,56 @@ public class Home {
         });
     }
 
+    public void showJson(Json json) {
+        if (json == null) {
+            return;
+        }
+
+        if (this.textEquivalentCheck.isSelected()) {
+            this.textAreaJson.setText(this.json.toString());
+            return;
+        }
+
+        List<IUnitJson> unitList = json.getValue();
+        UnitJson rootUnit;
+        if (json.getType() == TypeUnit.UNIT) {
+            rootUnit = new UnitJson(
+                    "[UnitList]",
+                    new ValueUnitsJsonList(TypeUnit.UNIT),
+                    IUnitJson.TypeValue.UNITS_ARRAY
+            );
+        } else {
+            rootUnit = new UnitJson(
+                    "[ArrayList]",
+                    new ValueUnitsJsonList(TypeUnit.ARRAY_UNIT),
+                    IUnitJson.TypeValue.UNITS_ARRAY
+            );
+        }
+        TreeItem<IUnitJson> rootItem = new TreeItem<>(rootUnit);
+        rootItem.setExpanded(true);
+        if (unitList != null) {
+            for (IUnitJson iUnitJson : unitList) {
+                TreeItem<IUnitJson> item = new TreeItem<>(iUnitJson);
+                if (iUnitJson.getValue() instanceof ValueUnitsJsonList) {
+                    item.getChildren().add(recursionShowJson(iUnitJson));
+                }
+                rootItem.getChildren().add(item);
+            }
+        }
+
+        treeView.setRoot(rootItem);
+    }
 
     private void onMauseClickTreeView(MouseEvent event) {
         if (event.getClickCount() == 1) { // Обработка одиночного щелчка
-            TreeItem<IUnitJson> selectedItem = treeView.getSelectionModel().getSelectedItem();
+            TreeItem<IUnitJson> selectedItem = this.treeView.getSelectionModel().getSelectedItem();
             if (selectedItem == null) return;
 
             // если это корневой элемент
-            if (selectedItem == treeView.getRoot()){
+            if (selectedItem == treeView.getRoot()) {
                 this.disableChangePanel(true);
 
-                if (this.json.getType() == TypeUnit.UNIT){
+                if (this.json.getType() == TypeUnit.UNIT) {
                     this.nameUnitTextField.setText("[UnitList]");
                 } else {
                     this.nameUnitTextField.setText("[ArrayList]");
@@ -889,29 +936,6 @@ public class Home {
         }
     }
 
-    private void onActionSaveButton(ActionEvent event) {
-        if (this.nameUnitTextField.getText().isEmpty()) {
-            ShowBox.showError(new TranslationTextComponent("error.input.notentered", new TranslationTextComponent("name")));
-            return;
-        } else if (this.valueUnitTextArea.getText().isEmpty()) {
-            ShowBox.showError(new TranslationTextComponent("error.input.notentered", new TranslationTextComponent("value")));
-            return;
-        }
-        IUnitJson newUnit = this.unitJson;
-        newUnit.setName(this.nameUnitTextField.getText());
-
-        if (this.numCheckBox.isSelected()) {
-            newUnit.setValue(this.valueUnitTextArea.getText(), IUnitJson.TypeValue.NUMBER);
-        } else {
-            newUnit.setValue(this.valueUnitTextArea.getText(), IUnitJson.TypeValue.STRING);
-        }
-
-        json.set(json.indexOf(this.unitJson), newUnit);
-        this.unitJson = newUnit;
-
-        treeView.refresh(); // Обновление TreeView
-    }
-
     private void onActionCancelButton(ActionEvent event) {
         this.unitJson = null;
         this.nameUnitTextField.clear();
@@ -929,14 +953,29 @@ public class Home {
         this.cancelButton.setDisable(enable);
     }
 
-    private void disconnect(){
-        for (SFTPClient client : SFTPClient.connections){
+    private void onActionSaveButton(ActionEvent event) {
+        IUnitJson newUnit = this.unitJson;
+        newUnit.setName(this.nameUnitTextField.getText());
+
+        if (this.numCheckBox.isSelected()) {
+            newUnit.setValue(this.valueUnitTextArea.getText(), IUnitJson.TypeValue.NUMBER);
+        } else {
+            newUnit.setValue(this.valueUnitTextArea.getText(), IUnitJson.TypeValue.STRING);
+        }
+
+        this.json.set(json.indexOf(this.unitJson), newUnit);
+        this.unitJson = newUnit;
+
+        treeView.refresh(); // Обновление TreeView
+    }
+
+    private void disconnect() {
+        for (SFTPClient client : SFTPClient.connections) {
             client.disconnect();
         }
         clearTreeView(directoryTreeView);
         clearTreeView(treeView);
+        jsonIsRemote = false;
+        remotePath = "";
     }
-
-
-
 }

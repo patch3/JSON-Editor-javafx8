@@ -5,6 +5,8 @@ import java.util.List;
 public interface IUnitJson {
     Object getValue();
 
+    void setValue(IUnitJson value);
+
     List<IUnitJson> getValueList();
 
     TypeUnit getTypeUnit();
@@ -13,12 +15,9 @@ public interface IUnitJson {
 
     String getName();
 
-
-    void setValue(IUnitJson value);
+    void setName(Object name);
 
     void setValue(Object value, TypeValue type);
-
-    void setName(Object name);
 
     @Override
     boolean equals(Object o);

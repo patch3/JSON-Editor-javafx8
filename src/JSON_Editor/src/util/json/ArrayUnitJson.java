@@ -10,7 +10,7 @@ public class ArrayUnitJson extends AbstractElementJson {
         super(TypeUnit.ARRAY_UNIT);
     }
 
-    public ArrayUnitJson(int index){
+    public ArrayUnitJson(int index) {
         this();
         this.index = index;
     }
@@ -25,18 +25,16 @@ public class ArrayUnitJson extends AbstractElementJson {
         this(obj.value, obj.typeValue);
     }
 
-    
 
     @Override
     public String toString() {
-        if (this.typeValue == TypeValue.UNITS_ARRAY){
+        if (this.typeValue == TypeValue.UNITS_ARRAY) {
             return "[List]";
-        } else if (this.typeValue == TypeValue.STRING){
+        } else if (this.typeValue == TypeValue.STRING) {
             return String.format("\"%s\"", this.value);
         }
         return (String) this.value;
     }
-
 
 
     @Override
@@ -45,8 +43,13 @@ public class ArrayUnitJson extends AbstractElementJson {
     }
 
     @Override
-    public void setName(Object obj){
-        if (obj instanceof Number){
+    public String getName() {
+        return String.format("[%d]", this.index);
+    }
+
+    @Override
+    public void setName(Object obj) {
+        if (obj instanceof Number) {
             this.index = (int) obj;
         } else {
             throw new IllegalArgumentException("Ожидался index");
@@ -54,17 +57,9 @@ public class ArrayUnitJson extends AbstractElementJson {
     }
 
     @Override
-    public String getName(){
-        return String.format("[%d]", this.index);
-    }
-
-
-
-    @Override
     public TypeUnit getTypeUnit() {
         return super.TYPE_UNIT;
     }
 
-    
 
 }

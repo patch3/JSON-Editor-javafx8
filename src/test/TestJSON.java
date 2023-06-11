@@ -49,8 +49,8 @@ public class TestJSON {
         try {
             Json actualJson = new Json(new File(
                     Objects.requireNonNull(
-                        getClass()
-                                .getResource("/resource/attachments_units.json")
+                            getClass()
+                                    .getResource("/resource/attachments_units.json")
                     ).getPath()
             ));
             List<UnitJson> actual = actualJson.getUnitsValue();
@@ -64,13 +64,13 @@ public class TestJSON {
     public void testSimpleArray() {
         List<ArrayUnitJson> expected = new ArrayList<>();
         expected.add(new ArrayUnitJson("46,56,78", UnitJson.TypeValue.STRING));
-        expected.add(new ArrayUnitJson( "12345", UnitJson.TypeValue.NUMBER));
+        expected.add(new ArrayUnitJson("12345", UnitJson.TypeValue.NUMBER));
 
         try {
             Json actualJson = new Json(new File(
                     Objects.requireNonNull(
-                        getClass()
-                            .getResource("/resource/simple_array.json")
+                            getClass()
+                                    .getResource("/resource/simple_array.json")
                     ).getPath()
             ));
             List<ArrayUnitJson> actual = actualJson.getArrayValue();
@@ -91,19 +91,19 @@ public class TestJSON {
         attachment.add(new ArrayUnitJson("436", UnitJson.TypeValue.NUMBER));
 
         expected.add(
-            new ArrayUnitJson(
-                new ValueUnitsJsonList(
-                        attachment,
-                        TypeUnit.ARRAY_UNIT
-                ), ArrayUnitJson.TypeValue.UNITS_ARRAY
-        ));
+                new ArrayUnitJson(
+                        new ValueUnitsJsonList(
+                                attachment,
+                                TypeUnit.ARRAY_UNIT
+                        ), ArrayUnitJson.TypeValue.UNITS_ARRAY
+                ));
 
         try {
             Json actualJson = new Json(new File(
-                Objects.requireNonNull(
-                    getClass()
-                        .getResource("/resource/attachments_array.json")
-                ).getPath()
+                    Objects.requireNonNull(
+                            getClass()
+                                    .getResource("/resource/attachments_array.json")
+                    ).getPath()
             ));
             List<ArrayUnitJson> actual = actualJson.getArrayValue();
             assertEquals(expected, actual);
@@ -113,7 +113,7 @@ public class TestJSON {
     }
 
     @Test
-    public void testHardJson(){
+    public void testHardJson() {
         List<UnitJson> expected = new ArrayList<>();
         expected.add(new UnitJson("name", "resource", UnitJson.TypeValue.STRING));
         expected.add(new UnitJson("version", "3647", UnitJson.TypeValue.NUMBER));
@@ -164,7 +164,7 @@ public class TestJSON {
     }
 
     @Test
-    public void testHardMinJson(){
+    public void testHardMinJson() {
         List<UnitJson> expected = new ArrayList<>();
         expected.add(new UnitJson("name", "resource", UnitJson.TypeValue.STRING));
         expected.add(new UnitJson("version", "3647", UnitJson.TypeValue.NUMBER));

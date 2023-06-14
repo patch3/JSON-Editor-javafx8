@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="scene" cacheShape="false" minHeight="100.0" minWidth="200.0" prefHeight="400.0"
+            prefWidth="600.0" style="-fx-background-color: #fff;"
+            xmlns="http://javafx.com/javafx/8.0.171" fx:controller="com.editor.controller.Home">
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="44.0" prefWidth="600.0"
+                style="-fx-background-color: #243b69;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                AnchorPane.topAnchor="0.0">
+        <Label alignment="CENTER" layoutX="450.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="44.0" prefWidth="150.0"
+               style="-fx-text-fill: #fff; -fx-text-alignment: center; -fx-content-display: center;" text="JSON Editor"
+               AnchorPane.rightAnchor="0.0">
+            <font>
+                <Font name="Verdana" size="20.0"/>
+            </font>
+        </Label>
+        <HBox alignment="CENTER_LEFT" layoutX="9.0" prefHeight="44.0" prefWidth="441.0" AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <MenuButton fx:id="fileMenu" mnemonicParsing="false" styleClass="MenuButton" text="File"
+                            textFill="WHITE">
+                    <items>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="openLocal" mnemonicParsing="false" text="Open"/>
+                        <MenuItem fx:id="openLocalFolder" mnemonicParsing="false" text="Open Folder"/>
+                        <MenuItem fx:id="createLocal" mnemonicParsing="false" text="Create File"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="saveFile" mnemonicParsing="false" text="Save"/>
+                        <MenuItem fx:id="saveAs" mnemonicParsing="false" text="Save Local as"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="exitFolder" mnemonicParsing="false" text="Exit Folder"/>
+                        <MenuItem fx:id="exitFile" mnemonicParsing="false" text="Exit File"/>
+                        <MenuItem fx:id="exitProg" mnemonicParsing="false" text="Exit Program"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                    </items>
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </MenuButton>
+                <MenuButton fx:id="connectMenu" mnemonicParsing="false" styleClass="MenuButton" text="Connect"
+                            textFill="WHITE">
+                    <items>
+                        <MenuItem fx:id="configureConn" mnemonicParsing="false" text="Configure"/>
+                        <MenuItem fx:id="connectToFolder" mnemonicParsing="false" text="Connect to Folder"/>
+                        <MenuItem fx:id="disconnect" mnemonicParsing="false" text="Disconnect"/>
+                    </items>
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </MenuButton>
+                <MenuButton fx:id="infoMenu" mnemonicParsing="false" styleClass="MenuButton" text="info"
+                            textFill="WHITE">
+                    <items>
+                        <MenuItem fx:id="infoThisAppItem" mnemonicParsing="false" text="About this app"/>
+                        <MenuItem fx:id="usersGuideItem" mnemonicParsing="false" text="users guide"/>
+                    </items>
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </MenuButton>
+                <MenuButton fx:id="viewMenu" mnemonicParsing="false" styleClass="MenuButton" text="view"
+                            textFill="WHITE">
+                    <items>
+                        <RadioMenuItem fx:id="textEquivalentCheck" mnemonicParsing="false" text="Text equivalent"/>
+                        <Menu fx:id="language" mnemonicParsing="false" text="Language"/>
+                    </items>
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </MenuButton>
+            </children>
+        </HBox>
+    </AnchorPane>
+    <SplitPane dividerPositions="0.2591973244147157, 0.7290969899665551" layoutY="43.0" prefHeight="357.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="43.0">
+        <TreeView fx:id="directoryTreeView"/>
+        <TreeView fx:id="treeView" editable="true" />
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+            <TextField fx:id="nameUnitTextField" disable="true" layoutX="6.0" layoutY="36.0" prefHeight="25.0"
+                       prefWidth="171.0" promptText="name" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="6.0"/>
+            <TextArea fx:id="valueUnitTextArea" disable="true" layoutX="7.0" layoutY="93.0" prefHeight="152.0"
+                      prefWidth="171.0" promptText="value" AnchorPane.bottomAnchor="110.0" AnchorPane.leftAnchor="7.0"
+                      AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="93.0"/>
+            <Button fx:id="saveButton" disable="true" layoutX="6.0" layoutY="261.0" mnemonicParsing="false"
+                    prefHeight="33.0" prefWidth="147.0" text="Save" AnchorPane.bottomAnchor="61.0"
+                    AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="6.0"/>
+            <Button fx:id="cancelButton" disable="true" layoutX="7.0" layoutY="308.0" mnemonicParsing="false"
+                    prefHeight="33.0" prefWidth="171.0" text="Сancel" AnchorPane.bottomAnchor="14.0"
+                    AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="5.0"/>
+            <Label fx:id="nameLabel" layoutX="7.0" layoutY="14.0" text="name" AnchorPane.leftAnchor="7.0"
+                   AnchorPane.topAnchor="14.0"/>
+            <Label fx:id="valueLabel" layoutX="7.0" layoutY="69.0" text="value" AnchorPane.leftAnchor="7.0"
+                   AnchorPane.topAnchor="69.0"/>
+            <CheckBox fx:id="numCheckBox" disable="true" layoutX="81.0" layoutY="69.0" mnemonicParsing="false"
+                      text="number"/>
+        </AnchorPane>
+    </SplitPane>
+</AnchorPane>

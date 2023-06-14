@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-src.Main-Class: src.Main
-

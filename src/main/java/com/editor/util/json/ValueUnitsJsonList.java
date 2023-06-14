@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 public class ValueUnitsJsonList {
     public static final char[] START_VALUE_CHAR = {'"', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '[', '{'};
 
-    private final String TAB = "  ";
-
     protected List<IUnitJson> value;
 
     protected TypeUnit type;
@@ -255,7 +253,7 @@ public class ValueUnitsJsonList {
                     return;
                 }
                 tempElementUnit = valueList.get(index);
-                if (i == indexs.length - 2 && tempElementUnit.getTypeUnit() == element.getTypeUnit()) {
+                if (i == indexs.length - 2 && tempElementUnit.getTypeUnit() != element.getTypeUnit()) {
                     throw new RuntimeException("Stored type does not match " + element.getTypeUnit().toString());
                 }
                 if (tempElementUnit.getTypeValue() == IUnitJson.TypeValue.UNITS_ARRAY) {
@@ -401,9 +399,11 @@ public class ValueUnitsJsonList {
                 sb.append(unit.toString(newDepth));
                 sb.append(",\r\n");
             }
-            // Remove the last comma and line break
-            sb.setLength(sb.length() - 3);
-            sb.append("\r\n");
+            // Удаление последней запятой и переноса строки
+            if (sb.length() > 3) {
+                sb.setLength(sb.length() - 3);
+                sb.append("\r\n");
+            }
         }
         sb.append(tabs(d));
         sb.append(closingBracket);
@@ -416,6 +416,7 @@ public class ValueUnitsJsonList {
     }
 
     protected String tabs(int d) {
+        String TAB = "  ";
         return String.join("", Collections.nCopies(d, TAB));
     }
 

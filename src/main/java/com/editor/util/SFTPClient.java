@@ -16,7 +16,6 @@ import java.util.Vector;
 public class SFTPClient {
     public static List<SFTPClient> connections = new ArrayList<>();
 
-
     private String hostname;
     private int port;
     private String username;
@@ -114,7 +113,6 @@ public class SFTPClient {
         List<DirectoryElement> jsons = new ArrayList<>();
         List<DirectoryElement> folders = new ArrayList<>();
         remoteFolderPath = remoteFolderPath.replace("\\", "/");
-
         Vector<ChannelSftp.LsEntry> files = channelSftp.ls(remoteFolderPath);
         for (ChannelSftp.LsEntry entry : files) {
             if (entry.getFilename().equals("..") || entry.getFilename().equals(".")) {
@@ -141,7 +139,7 @@ public class SFTPClient {
 
         try {
             File localFile = new File(localFilePath);
-            inputStream = new FileInputStream(localFile);
+            inputStream = Files.newInputStream(localFile.toPath());
 
             channelSftp.put(inputStream, remoteFilePath, ChannelSftp.OVERWRITE);
         } catch (IOException e) {

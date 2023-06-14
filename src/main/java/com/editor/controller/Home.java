@@ -27,9 +27,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import com.editor.Main;
-
-import com.editor.*;
-
+import com.editor.util.SFTPClient;
+import com.editor.util.ShowBox;
+import com.editor.util.TranslationTextComponent;
+import com.editor.util.directory.Directory;
+import com.editor.util.directory.DirectoryElement;
+import com.editor.util.directory.IDirectory;
+import com.editor.util.json.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -126,7 +130,17 @@ public class Home {
         this.createLocal.setOnAction(event -> eventClickCreateLocal(event, null)); // создание файла локально
         this.openLocalFolder.setOnAction(this::eventClickOpenLocalFolder); // открытие папки локально
         this.saveFile.setOnAction(this::eventSaveFile); // сохранить файл
-
+        exitProg.setOnAction(event -> Platform.exit());
+        exitFile.setOnAction(event -> {
+            clearTreeView(treeView);
+            json = null;
+        });
+        exitFolder.setOnAction(event -> {
+            clearTreeView(treeView);
+            clearTreeView(directoryTreeView);
+            json = null;
+        });
+        /* __________________ */
 
         /* пункт удаленного подключения */
         this.configureConn.setOnAction(this::eventClickConfigureConn); // открытие окна конфигурации удаленного подключения
@@ -161,20 +175,11 @@ public class Home {
         this.saveButton.setOnAction(this::onActionSaveButton);
         this.cancelButton.setOnAction(this::onActionCancelButton);
 
-
+        /* панель вида */
         this.textEquivalentCheck.setOnAction(this::eventOnActionTextEquivalentCheck);
 
 
-        exitProg.setOnAction(event -> Platform.exit());
-        exitFile.setOnAction(event -> {
-            clearTreeView(treeView);
-            json = null;
-        });
-        exitFolder.setOnAction(event -> {
-            clearTreeView(treeView);
-            clearTreeView(directoryTreeView);
-            json = null;
-        });
+
     }
 
     /**
@@ -263,7 +268,7 @@ public class Home {
                 break;
             }
         }
-        setText();
+        this.setText();
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.editor.util.json;
 
+import com.editor.util.Convert;
 import com.sun.istack.internal.Nullable;
 import com.editor.util.Interpreter;
 
@@ -44,7 +45,7 @@ public abstract class AbstractElementJson implements IUnitJson {
             case '"':
                 this.value = Interpreter.string(chStr, i);
                 this.typeValue = TypeValue.STRING;
-                return ((String) this.value).length() + 1 + i;
+                return Convert.countRecord((String)this.value)+i+1;
             case '{':
                 this.value = new ValueUnitsJsonList();
                 this.typeValue = TypeValue.UNITS_ARRAY;
@@ -62,6 +63,8 @@ public abstract class AbstractElementJson implements IUnitJson {
                 throw new JsonException("error.json.exp_value", i );
         }
     }
+
+
 
 
 
@@ -137,11 +140,11 @@ public abstract class AbstractElementJson implements IUnitJson {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AbstractElementJson that = (AbstractElementJson) o;
-        return TYPE_UNIT == that.TYPE_UNIT && Objects.equals(value, that.value) && typeValue == that.typeValue;
+        return Objects.equals(value, that.value) && typeValue == that.typeValue;
     }
 
     public int hashCodeContent() {
-        return Objects.hash(TYPE_UNIT, value, typeValue);
+        return Objects.hash(value, typeValue);
     }
 
     @Override
@@ -149,12 +152,12 @@ public abstract class AbstractElementJson implements IUnitJson {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AbstractElementJson that = (AbstractElementJson) o;
-        return id == that.id && TYPE_UNIT == that.TYPE_UNIT && Objects.equals(value, that.value) && typeValue == that.typeValue;
+        return id == that.id && Objects.equals(value, that.value) && typeValue == that.typeValue;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(TYPE_UNIT, value, typeValue, id);
+        return Objects.hash(value, typeValue, id);
     }
 
     public String toString() {
@@ -166,10 +169,10 @@ public abstract class AbstractElementJson implements IUnitJson {
         if (this.typeValue == TypeValue.UNITS_ARRAY) {
             return this.getUnitList().toString(d);
         } else if (this.typeValue == TypeValue.STRING) {
-            return String.format("\"%s\"", this.value);
+            return String.format("\"%s\"", Convert.toRecord((String)this.value));
         }
         if (this.typeValue == TypeValue.NUMBER) {
-            return (String) this.value;
+            return (String)this.value;
         }
         return null;
     }

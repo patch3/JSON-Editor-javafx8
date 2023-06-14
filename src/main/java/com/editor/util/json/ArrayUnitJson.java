@@ -1,5 +1,7 @@
 package com.editor.util.json;
 
+import com.editor.util.Convert;
+
 import java.util.Objects;
 
 public class ArrayUnitJson extends AbstractElementJson {
@@ -39,7 +41,7 @@ public class ArrayUnitJson extends AbstractElementJson {
         if (this.typeValue == TypeValue.UNITS_ARRAY) {
             return "[List]";
         } else if (this.typeValue == TypeValue.STRING) {
-            return String.format("\"%s\"", this.value);
+            return String.format("\"%s\"", Convert.toRecord((String) this.value));
         }
         return (String) this.value;
     }

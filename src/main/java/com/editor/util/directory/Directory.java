@@ -40,7 +40,7 @@ public class Directory implements IDirectory {
 
     public Directory(DirectoryElement element) {
         remote = false;
-        parentDir = new File(element.parentDir.pathToElement());
+        parentDir = new File(element.pathToElement());
         File rootFile = new File(element.pathToElement());
         if (!rootFile.exists()) {
             throw new NullPointerException(new TranslationTextComponent("exception.dirNotFound", rootFile.getAbsolutePath()).toString());

@@ -28,19 +28,19 @@ public class Interpreter {
         StringBuilder strBuilder = new StringBuilder();
         while (i < chStr.length) {
             char c = chStr[i];
-            if (c == '\\' && i < chStr.length - 1 && chStr[i + 1] == '"') {
+            if (i < chStr.length - 1 && c == '\\' && chStr[i + 1] == '"') {
                 // Если встретился символ обратного слеша перед кавычкой, то добавляем в строку кавычку без экранирования
                 strBuilder.append('"');
-                i++;
+                ++i;
             } else if (c == '"') {
                 // Если встретилась кавычка, то выходим из цикла
                 return strBuilder.toString();
             } else {
                 strBuilder.append(c);
             }
-            i++;
+            ++i;
         }
-        throw new SyntaxException("End of String not found of index " + i);
+        throw new SyntaxException("Не найден конец строки на индексе " + i);
     }
 
     public static String numberStr(char[] chStr, int i) {
@@ -79,6 +79,8 @@ public class Interpreter {
         }
         return numBuilder.toString();
     }
+
+
 
     public static Number number(char[] chStr, int i) {
         if (!(Character.isDigit(chStr[i]) || (chStr[i] == '-'))) {

@@ -37,7 +37,9 @@ public class Json extends ValueUnitsJsonList {
 
 
 
-    /** разрывает ссылку и выделает память под unit сохраняя его тип*/
+    /**
+     *  разрывает ссылку и выделает память под unit сохраняя его тип
+     *  */
     public static IUnitJson newUnit(IUnitJson obj){
         if (obj == null) return null;
         if (obj instanceof UnitJson) {
@@ -46,4 +48,8 @@ public class Json extends ValueUnitsJsonList {
             return new ArrayUnitJson(obj);
         }
     }
+
+
+
+
 }

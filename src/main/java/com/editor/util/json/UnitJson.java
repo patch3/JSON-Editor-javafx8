@@ -1,6 +1,7 @@
 package com.editor.util.json;
 
 
+import com.editor.util.Convert;
 import com.editor.util.Interpreter;
 
 import java.util.Objects;
@@ -43,7 +44,7 @@ public class UnitJson extends AbstractElementJson {
 
     @Override
     public String toString(int d) {
-        return String.format("\"%s\": %s", this.name, super.toString(d));
+        return String.format("\"%s\": %s", this.getName(), super.toString(d));
     }
 
     @Override
@@ -69,7 +70,7 @@ public class UnitJson extends AbstractElementJson {
 
     @Override
     public String getName() {
-        return this.name;
+        return Convert.toRecord(this.name);
     }
 
     @Override

@@ -92,6 +92,4 @@ public class UnitTestJson {
 
         assertEquals(expected, actual);
     }
-
-
 }

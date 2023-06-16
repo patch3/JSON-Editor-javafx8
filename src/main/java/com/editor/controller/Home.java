@@ -1,6 +1,7 @@
 package com.editor.controller;
 
 
+import com.editor.util.FileUtils;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.sun.istack.internal.Nullable;
@@ -17,6 +18,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -130,18 +133,20 @@ public class Home {
         this.createLocal.setOnAction(event -> eventClickCreateLocal(event, null)); // создание файла локально
         this.openLocalFolder.setOnAction(this::eventClickOpenLocalFolder); // открытие папки локально
         this.saveFile.setOnAction(this::eventSaveFile); // сохранить файл
-        exitProg.setOnAction(event -> Platform.exit());
-        exitFile.setOnAction(event -> {
-            clearTreeView(treeView);
-            json = null;
+        this.exitProg.setOnAction(event -> Platform.exit());
+        this.exitFile.setOnAction(event -> {
+            clearTreeView(this.treeView);
+            this.json = null;
         });
-        exitFolder.setOnAction(event -> {
-            clearTreeView(treeView);
-            clearTreeView(directoryTreeView);
-            json = null;
+        this.exitFolder.setOnAction(event -> {
+            clearTreeView(this.treeView);
+            clearTreeView(this.directoryTreeView);
+            this.json = null;
         });
+        this.saveAs.setOnAction(this::eventSaveAs);
         /* __________________ */
 
+        this.scene.setOnKeyReleased(this::onKeyReleased);
         /* пункт удаленного подключения */
         this.configureConn.setOnAction(this::eventClickConfigureConn); // открытие окна конфигурации удаленного подключения
         this.connectToFolder.setOnAction(this::eventClickOpenRemoteFolder); // подключиться по удалунному соединению к файлу
@@ -178,8 +183,34 @@ public class Home {
         /* панель вида */
         this.textEquivalentCheck.setOnAction(this::eventOnActionTextEquivalentCheck);
 
+    }
 
+    private void eventSaveAs(ActionEvent event) {
+        if (this.workFile == null) return;
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(new TranslationTextComponent("menu_item.save.as").toString());
+        fileChooser.setInitialFileName("NewJson");
 
+        // Установка фильтров для типов файлов
+        FileChooser.ExtensionFilter txtFilter = new FileChooser.ExtensionFilter("Text Files (*.txt)", "*.txt");
+        FileChooser.ExtensionFilter jsonFilter = new FileChooser.ExtensionFilter("Json Files (*.json)", "*.json");
+        fileChooser.getExtensionFilters().addAll(jsonFilter, txtFilter);
+        fileChooser.setSelectedExtensionFilter(jsonFilter);
+
+        // Открытие диалогового окна "Сохранить как"
+        File file = fileChooser.showSaveDialog(scene.getScene().getWindow());
+
+        if (file != null) {
+            this.workFile = file;
+            this.eventSaveFile(null);
+        }
+
+    }
+
+    private void onKeyReleased(KeyEvent keyEvent) {
+        if (keyEvent.isControlDown() && keyEvent.getCode().equals(KeyCode.S)){
+            this.eventSaveFile(null);
+        }
     }
 
     /**
@@ -220,7 +251,6 @@ public class Home {
      *  */
     private void eventOnActionTextEquivalentCheck(ActionEvent event) {
         if (this.textEquivalentCheck.isSelected()) { // если при нажатии флажок нажат
-
             TextArea textArea = new TextArea();
             // при выделении флажка
             if (this.treeView.getRoot() == null || this.treeView.getRoot().getChildren().isEmpty()) {
@@ -312,7 +342,7 @@ public class Home {
     }
 
     /**
-     * ивент создание элемента в дереве json
+     * Эвент создание элемента в дереве json
      * @param event
      * @param selectedItem элемент дерева по которому нажали
      * @param labelUnit название элемента
@@ -399,17 +429,19 @@ public class Home {
         int[] indexs = this.json.indexOf(selectedUnit);
 
         this.json.delete(indexs);
-
-        this.getParentTreeItem(indexs).getChildren().remove(indexs[indexs.length - 1]);
-        treeView.refresh(); // Обновление TreeView
+        selectedItem.getParent().getValue().getValueList().remove(indexs[indexs.length - 1]);
+        //this.getParentTreeItem(indexs).getChildren().remove(indexs[indexs.length - 1]);
+        this.treeView.refresh(); // Обновление TreeView
     }
 
     private void clearTreeView(TreeView<?> treeView) {
-        if (!this.textEquivalentCheck.isSelected()) { // если при нажатии флажок нажат
-
+        this.json = null;
+        if (this.textEquivalentCheck.isSelected()) {
+            this.textAreaJson.clear();
+        } else {
+            this.treeView.setRoot(null);
+            this.treeView.refresh();
         }
-        treeView.setRoot(null);
-        treeView.refresh();
     }
 
     private void eventDirectoryTreeViewContextMenuRequest(ContextMenuEvent event) {
@@ -448,7 +480,7 @@ public class Home {
         menu.show(scene.getScene().getWindow(), event.getScreenX(), event.getScreenY());
     }
 
-    private TreeItem<IUnitJson> getParentTreeItem(int[] indexes) {
+    /*private TreeItem<IUnitJson> getParentTreeItem(int[] indexes) {
         TreeItem<IUnitJson> tempElementItem = this.treeView.getTreeItem(0);
         ObservableList<TreeItem<IUnitJson>> treeItemList = tempElementItem.getChildren();
         for (int i = 0; i < indexes.length; ++i) {
@@ -468,7 +500,7 @@ public class Home {
             }
         }
         throw new RuntimeException("Unable to get parent");
-    }
+    }*/
 
     private void deleteJsonRemote(String pathToElement) throws SftpException, JSchException {
         SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
@@ -505,6 +537,8 @@ public class Home {
         SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
         client.connect();
         client.createDirectory(remotePath + File.separator + dirName);
+        Directory directory = client.getDirectory(directoryTreeView.getSelectionModel().getSelectedItem().getValue().pathToElement(), directoryTreeView.getSelectionModel().getSelectedItem().getValue());
+        this.fillTree(directoryTreeView.getSelectionModel().getSelectedItem(), client.getDirectory(directoryTreeView.getSelectionModel().getSelectedItem().getValue().pathToElement(), directory));
         client.disconnect();
     }
 
@@ -531,13 +565,6 @@ public class Home {
             ok.setOnAction(event1 -> {
                 try {
                     createRemoteDirectory(selectedElement.pathToElement(), field.getText());
-                    System.err.println(selectedElement.pathToElement().replace("\\", "/") + File.separator + field.getText() + " : " + directoryTreeView.getSelectionModel().getSelectedItem().getValue());
-                    directoryTreeView.getSelectionModel().getSelectedItem().getChildren().add(new TreeItem<>(
-                            new DirectoryElement(
-                                    selectedElement.pathToElement().replace("\\", "/") + File.separator + field.getText(),
-                                    directoryTreeView.getSelectionModel().getSelectedItem().getValue(),
-                                    false
-                            )));
                 } catch (Exception e) {
                     ShowBox.showError(new TranslationTextComponent("error.create.remote.file", e.getMessage()));
                     e.printStackTrace();
@@ -557,12 +584,7 @@ public class Home {
                 try {
                     File f = new File( selectedElement.pathToElement() + File.separator + field.getText());
                     f.mkdirs();
-                    directoryTreeView.getSelectionModel().getSelectedItem().getChildren().add(new TreeItem<>(
-                            new DirectoryElement(
-                                    f,
-                                    directoryTreeView.getSelectionModel().getSelectedItem().getValue(),
-                                    false
-                            )));
+                    this.fillTree(directoryTreeView.getSelectionModel().getSelectedItem(), new Directory(f));
                 } catch (Exception e) {
                     ShowBox.showError(new TranslationTextComponent("error.create.dir", e.getMessage()));
                     e.printStackTrace();
@@ -571,6 +593,7 @@ public class Home {
                     directoryTreeView.refresh();
                 }
             });
+
         }
         box.getChildren().setAll(text, field, ok);
         pane.getChildren().add(box);
@@ -580,24 +603,34 @@ public class Home {
     private void eventDeleteDirectory(ActionEvent event) {
         TreeItem<IDirectory> selectedItem = directoryTreeView.getSelectionModel().getSelectedItem();
         DirectoryElement selectedItemValue = (DirectoryElement) selectedItem.getValue();
-
-        SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
-        try {
-            client.connect();
-            client.deleteDirectory(selectedItemValue.pathToElement());
+        if (selectedItemValue.isRemote()){
+            SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
+            try {
+                client.connect();
+                client.deleteDirectory(selectedItemValue.pathToElement());
+                directoryTreeView.getSelectionModel().getSelectedItem().getParent().getChildren().remove(directoryTreeView.getSelectionModel().getSelectedItem());
+            } catch (Exception e) {
+                ShowBox.showError(new TranslationTextComponent("error.delete.remote.dir", e.getMessage()));
+            } finally {
+                client.disconnect();
+                directoryTreeView.refresh();
+            }
+        }else {
+            File f = new File(selectedItemValue.pathToElement());
+            FileUtils.deleteFolder(f.getAbsolutePath());
+            ShowBox.showInfo(new TranslationTextComponent("showbox.info.headertext"), new TranslationTextComponent("succes.file.deleted"));
             directoryTreeView.getSelectionModel().getSelectedItem().getParent().getChildren().remove(directoryTreeView.getSelectionModel().getSelectedItem());
-        } catch (Exception e) {
-            ShowBox.showError(new TranslationTextComponent("error.delete.remote.dir", e.getMessage()));
-        } finally {
-            client.disconnect();
-            directoryTreeView.refresh();
+
         }
+
     }
 
     private void createRemoteJsonFile(String remotePath, String fileName) throws JSchException, SftpException {
         SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
         client.connect();
         client.createFile(remotePath + File.separator + fileName + ".json");
+        Directory directory = client.getDirectory(directoryTreeView.getSelectionModel().getSelectedItem().getValue().pathToElement(), directoryTreeView.getSelectionModel().getSelectedItem().getValue());
+        this.fillTree(directoryTreeView.getSelectionModel().getSelectedItem(), client.getDirectory(directoryTreeView.getSelectionModel().getSelectedItem().getValue().pathToElement(), directory));
         client.disconnect();
     }
 
@@ -619,12 +652,6 @@ public class Home {
             ok.setOnAction(event1 -> {
                 try {
                     createRemoteJsonFile(idir.pathToElement(), field.getText());
-                    directoryTreeView.getSelectionModel().getSelectedItem().getChildren().add(new TreeItem<>(
-                            new DirectoryElement(
-                                    idir.pathToElement().replace("\\", "/") + File.separator + field.getText() + ".json",
-                                    directoryTreeView.getSelectionModel().getSelectedItem().getValue(),
-                                    true
-                            )));
                     ShowBox.showInfo(new TranslationTextComponent("success"), new TranslationTextComponent("success.file.created"));
                 } catch (Exception e) {
                     ShowBox.showError(new TranslationTextComponent("error.create.remote.file", e.getMessage()));
@@ -642,6 +669,8 @@ public class Home {
             stage.show();
         } else {
             eventClickCreateLocal(null, new File(idir.pathToElement()));
+            this.fillTree(directoryTreeView.getSelectionModel().getSelectedItem(), new Directory((DirectoryElement) directoryTreeView.getSelectionModel().getSelectedItem().getValue()));
+
         }
     }
 
@@ -692,75 +721,79 @@ public class Home {
     private void onDirectoryTreeViewClick(MouseEvent event) {
         if (event.getClickCount() >= 2) {
             TreeItem<IDirectory> selectedItem = directoryTreeView.getSelectionModel().getSelectedItem();
-            if (selectedItem != null) {
-                if (selectedItem.getValue() instanceof Directory) return;
-                DirectoryElement selectedObject = (DirectoryElement) selectedItem.getValue();
-                if (selectedObject.isRemote()) {
-                    SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
-                    if (selectedObject.isJson) {
-                        try {
-                            client.connect();
-                            File file = client.downloadFile(selectedObject.pathToElement(), Main.tempDir + File.separator + selectedObject.getName());
-                            this.json = new Json(file);
-                            showJson();
-                            jsonIsRemote = true;
-                            remotePath = selectedObject.pathToElement();
-                            workFile = file;
-                        } catch (Exception e) {
-                            ShowBox.showError(new TranslationTextComponent("error.connection.unsuccessful", e.getMessage()));
-                            e.printStackTrace();
-                        } finally {
-                            if (client.isConnected()) {
-                                client.disconnect();
-                            }
-                        }
-                    } else {
-                        Directory directory;
-                        try {
-                            client.connect();
-                            directory = client.getDirectory(selectedObject.pathToElement(), selectedObject);
-                        } catch (Exception e) {
-                            ShowBox.showError(new TranslationTextComponent("error.connection.unsuccessful", e.getMessage()));
-                            e.printStackTrace();
-                            return;
-                        } finally {
-                            if (client.isConnected()) {
-                                client.disconnect();
-                            }
-                        }
-                        selectedItem.getChildren().clear();
-                        for (IDirectory element : directory.elementlist) {
-                            selectedItem.getChildren().add(new TreeItem<>(element));
-                        }
-                        for (IDirectory element : directory.jsonFiles) {
-                            selectedItem.getChildren().add(new TreeItem<>(element));
-                        }
-                        selectedItem.setExpanded(true);
-                    }
-                    return;
-                }
+            if (selectedItem == null) {
+                return;
+            }
+            if (selectedItem.getValue() instanceof Directory) {
+                return;
+            }
+            DirectoryElement selectedObject = (DirectoryElement) selectedItem.getValue();
+
+            if (selectedObject.isRemote()) {
+                SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
                 if (selectedObject.isJson) {
                     try {
-                        this.json = new Json(new File(selectedObject.pathToElement()));
+                        client.connect();
+                        File file = client.downloadFile(selectedObject.pathToElement(), Main.tempDir + File.separator + selectedObject.getName());
+                        this.json = new Json(file);
                         showJson();
-                        workFile = new File(selectedObject.pathToElement());
-                    } catch (IOException e) {
+                        jsonIsRemote = true;
+                        remotePath = selectedObject.pathToElement();
+                        workFile = file;
+                    } catch (Exception e) {
+                        ShowBox.showError(new TranslationTextComponent("error.connection.unsuccessful", e.getMessage()));
                         e.printStackTrace();
+                    } finally {
+                        if (client.isConnected()) {
+                            client.disconnect();
+                        }
                     }
                 } else {
-                    Directory directory = new Directory(selectedObject);
-                    selectedItem.getChildren().clear();
-                    for (IDirectory element : directory.elementlist) {
-                        selectedItem.getChildren().add(new TreeItem<>(element));
+                    Directory directory;
+                    try {
+                        client.connect();
+                        directory = client.getDirectory(selectedObject.pathToElement(), selectedObject);
+                    } catch (Exception e) {
+                        ShowBox.showError(new TranslationTextComponent("error.connection.unsuccessful", e.getMessage()));
+                        e.printStackTrace();
+                        return;
+                    } finally {
+                        if (client.isConnected()) {
+                            client.disconnect();
+                        }
                     }
-                    for (IDirectory element : directory.jsonFiles) {
-                        selectedItem.getChildren().add(new TreeItem<>(element));
-                    }
-                    selectedItem.setExpanded(true);
+                    this.fillTree(selectedItem, directory);
                 }
+                return;
+            }
+            if (selectedObject.isJson) {
+                try {
+                    this.json = new Json(new File(selectedObject.pathToElement()));
+                    showJson();
+                    workFile = new File(selectedObject.pathToElement());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Directory directory = new Directory(selectedObject);
+                this.fillTree(selectedItem, directory);
             }
         }
     }
+
+    private void fillTree(TreeItem<IDirectory> selectedItem, Directory directory){
+        selectedItem.getChildren().clear();
+        for (IDirectory element : directory.elementlist) {
+            selectedItem.getChildren().add(new TreeItem<>(element));
+        }
+        for (IDirectory element : directory.jsonFiles) {
+            selectedItem.getChildren().add(new TreeItem<>(element));
+        }
+        selectedItem.setExpanded(true);
+        directoryTreeView.refresh();
+    }
+
+
 
     private void eventSaveFile(ActionEvent event) {
         if (this.json == null) return;
@@ -820,13 +853,6 @@ public class Home {
                 write.write("{\n\t\n}");
                 write.flush();
                 write.close();
-                directoryTreeView.getSelectionModel().getSelectedItem().getChildren().add(new TreeItem<>(
-                        new DirectoryElement(
-                                workFile,
-                                directoryTreeView.getSelectionModel().getSelectedItem().getValue(),
-                                true
-                        )));
-                directoryTreeView.refresh();
             }else {
                 clearTreeView(treeView);
             }
@@ -902,7 +928,7 @@ public class Home {
         workDirectory = chooser.showDialog(scene.getScene().getWindow());
 
         if (workDirectory == null) return;
-        Directory dir = new Directory(workDirectory, null);
+        Directory dir = new Directory(workDirectory);
         openDirectory(dir);
     }
 

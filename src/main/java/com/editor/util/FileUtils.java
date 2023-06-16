@@ -6,11 +6,15 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class FileUtils {
+    /**
+     * @param filename Имя файла (с РАСШИРЕНИЕМ)
+     * @return Вернет его расширение
+     */
     public static String getExtensionByStringHandling(String filename) {
         if (filename != null && filename.contains(".")) {
             return filename.substring(filename.lastIndexOf(".") + 1);
         }
-        return null;
+        return "";
     }
 
     public static String readFile(String filePath) throws IOException {

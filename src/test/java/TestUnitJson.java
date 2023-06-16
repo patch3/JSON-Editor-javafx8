@@ -12,7 +12,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 
-public class UnitTestJson {
+public class TestUnitJson {
     @Test
     public void testHardIndexOf() throws IOException {
         Json actualJson = new Json(new File(

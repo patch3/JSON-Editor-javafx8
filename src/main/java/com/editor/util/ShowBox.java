@@ -16,6 +16,7 @@ public class ShowBox {
     public static void showInfo(TranslationTextComponent title, TranslationTextComponent textInfo) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title.toString());
+        alert.setHeaderText("showbox.info.headerText");
         alert.setContentText(textInfo.toString());
         alert.show();
     }

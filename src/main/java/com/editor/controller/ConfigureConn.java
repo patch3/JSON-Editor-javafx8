@@ -56,10 +56,8 @@ public class ConfigureConn {
     private Label passwordLabel;
 
     public static void loadSettingsFromFile() {
-
         try {
             Json json = new Json(settingsFile);
-
             List<UnitJson> jsons = json.getUnitsValue();
             for (UnitJson unit : jsons) {
                 switch (unit.getName()) {
@@ -130,7 +128,6 @@ public class ConfigureConn {
     }
 
     private void saveSettingsToFile() {
-
         List<UnitJson> json = new ArrayList<UnitJson>() {
             {
                 add(new UnitJson("hostname", savedHostname, IUnitJson.TypeValue.STRING));

@@ -1,6 +1,6 @@
 {
   "showbox.error.title": "Error",
-  "showbox.error.headertext": "An error occurred",
+  "showbox.error.headerText": "An error occurred",
   "exception.dirnotfound": "Folder %s not found",
   "error.configurecon.unabletocreatefile": "Unable to create file %s",
   "error.unabletodelete.file": "Error deleting file: %s",

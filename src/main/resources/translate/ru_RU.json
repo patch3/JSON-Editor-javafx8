@@ -45,6 +45,7 @@
   "button.check.connection": "Проверить соединение",
   "success.file.created": "Файл успешно создан",
   "succes.file.deleted": "Файл успешно удален",
+  "unsucces.file.delete": "Файл не был удален",
   "menu.language": "Язык",
   "menu.file": "Файл",
   "menu.connect": "Соединение",

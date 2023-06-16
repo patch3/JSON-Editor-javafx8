@@ -389,10 +389,19 @@ public class ValueUnitsJsonList {
         StringBuilder sb = new StringBuilder();
 
         int newDepth = d + 1;
-        String openingBracket = (this.getType() == TypeUnit.UNIT) ? "{\r\n" : "[\r\n";
-        String closingBracket = (this.getType() == TypeUnit.UNIT) ? "}\r\n" : "]\r\n";
+        char openingBracket;
+        char closingBracket;
+
+        if (this.getType() == TypeUnit.UNIT) {
+            openingBracket = '{';
+            closingBracket = '}';
+        } else {
+            openingBracket = '[';
+            closingBracket = ']';
+        }
 
         sb.append(openingBracket);
+        sb.append("\r\n");
         if (unitList != null) {
             for (IUnitJson unit : unitList) {
                 sb.append(tabs(newDepth));

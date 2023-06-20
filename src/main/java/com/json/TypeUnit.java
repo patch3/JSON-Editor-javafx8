@@ -1,4 +1,4 @@
-package com.editor.util.json;
+package com.json;
 
 public enum TypeUnit {
     UNIT,

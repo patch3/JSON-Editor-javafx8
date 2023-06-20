@@ -1,5 +1,5 @@
+import com.json.*;
 import org.junit.Test;
-import com.editor.util.json.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,24 +12,21 @@ import static org.junit.Assert.assertEquals;
 
 public class TestJSON {
     @Test
-    public void testSimpleJsonUnitsList() {
+    public void testSimpleJsonUnitsList() throws JsonException, IOException {
         List<UnitJson> expected = new ArrayList<>();
         expected.add(new UnitJson("name", "Test", UnitJson.TypeValue.STRING));
         expected.add(new UnitJson("tester", "123", UnitJson.TypeValue.NUMBER));
 
-        try {
-            Json actualJson = new Json(new File(
-                    Objects.requireNonNull(getClass().getResource("/json/simple_units.json")).getPath()
-            ));
-            List<UnitJson> actual = actualJson.getUnitsValue();
-            assertEquals(expected, actual);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Json actualJson = new Json(new File(
+                Objects.requireNonNull(getClass().getResource("/json/simple_units.json")).getPath()
+        ));
+        List<UnitJson> actual = actualJson.getUnitsValue();
+        assertEquals(expected, actual);
+
     }
 
     @Test
-    public void testAttachmentsUnits() {
+    public void testAttachmentsUnits() throws JsonException, IOException {
         List<UnitJson> expected = new ArrayList<>();
         expected.add(new UnitJson("name", "resurs", UnitJson.TypeValue.STRING));
         expected.add(new UnitJson("version", "123", UnitJson.TypeValue.NUMBER));
@@ -46,42 +43,37 @@ public class TestJSON {
                 ), UnitJson.TypeValue.UNITS_ARRAY)
         );
 
-        try {
-            Json actualJson = new Json(new File(
-                    Objects.requireNonNull(
-                            getClass()
-                                    .getResource("/json/attachments_units.json")
-                    ).getPath()
-            ));
-            List<UnitJson> actual = actualJson.getUnitsValue();
-            assertEquals(expected, actual);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Json actualJson = new Json(new File(
+                Objects.requireNonNull(
+                        getClass()
+                                .getResource("/json/attachments_units.json")
+                ).getPath()
+        ));
+        List<UnitJson> actual = actualJson.getUnitsValue();
+        assertEquals(expected, actual);
+
     }
 
     @Test
-    public void testSimpleArray() {
+    public void testSimpleArray() throws JsonException, IOException {
         List<ArrayUnitJson> expected = new ArrayList<>();
         expected.add(new ArrayUnitJson("46,56,78", UnitJson.TypeValue.STRING));
         expected.add(new ArrayUnitJson("12345", UnitJson.TypeValue.NUMBER));
 
-        try {
-            Json actualJson = new Json(new File(
-                    Objects.requireNonNull(
-                            getClass()
-                                    .getResource("/json/simple_array.json")
-                    ).getPath()
-            ));
-            List<ArrayUnitJson> actual = actualJson.getArrayValue();
-            assertEquals(expected, actual);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        Json actualJson = new Json(new File(
+                Objects.requireNonNull(
+                        getClass()
+                                .getResource("/json/simple_array.json")
+                ).getPath()
+        ));
+        List<ArrayUnitJson> actual = actualJson.getArrayValue();
+        assertEquals(expected, actual);
+
     }
 
     @Test
-    public void testAttachmentsArray() {
+    public void testAttachmentsArray() throws JsonException, IOException {
         List<ArrayUnitJson> expected = new ArrayList<>();
         expected.add(new ArrayUnitJson("name", UnitJson.TypeValue.STRING));
         expected.add(new ArrayUnitJson("3566", UnitJson.TypeValue.NUMBER));
@@ -98,22 +90,69 @@ public class TestJSON {
                         ), ArrayUnitJson.TypeValue.UNITS_ARRAY
                 ));
 
-        try {
-            Json actualJson = new Json(new File(
-                    Objects.requireNonNull(
-                            getClass()
-                                    .getResource("/json/attachments_array.json")
-                    ).getPath()
-            ));
-            List<ArrayUnitJson> actual = actualJson.getArrayValue();
+
+        Json actualJson = new Json(new File(
+                Objects.requireNonNull(
+                        getClass()
+                                .getResource("/json/attachments_array.json")
+                ).getPath()
+        ));
+        List<ArrayUnitJson> actual = actualJson.getArrayValue();
+        assertEquals(expected, actual);
+
+    }
+
+    @Test
+    public void testHardJson() throws JsonException, IOException {
+        List<UnitJson> expected = new ArrayList<>();
+        expected.add(new UnitJson("name", "resource", UnitJson.TypeValue.STRING));
+        expected.add(new UnitJson("version", "3647", UnitJson.TypeValue.NUMBER));
+
+        List<ArrayUnitJson> attachment = new ArrayList<>();
+        attachment.add(new ArrayUnitJson("egeg", UnitJson.TypeValue.STRING));
+        attachment.add(new ArrayUnitJson("575", UnitJson.TypeValue.NUMBER));
+        attachment.add(new ArrayUnitJson(
+                new ValueUnitsJsonList(
+                        null,
+                        TypeUnit.UNIT
+                ), UnitJson.TypeValue.UNITS_ARRAY
+        ));
+        attachment.add(new ArrayUnitJson(
+                new ValueUnitsJsonList(
+                        null,
+                        TypeUnit.ARRAY_UNIT
+                ), UnitJson.TypeValue.UNITS_ARRAY
+        ));
+
+
+        expected.add(new UnitJson(
+                "dependencies",
+                new ValueUnitsJsonList(
+                        attachment,
+                        TypeUnit.ARRAY_UNIT
+                ), UnitJson.TypeValue.UNITS_ARRAY)
+        );
+
+
+        Json actualJson = new Json(new File(
+                Objects.requireNonNull(
+                        getClass()
+                                .getResource("/json/hard.json")
+                ).getPath()
+        ));
+        if (actualJson.getType() == TypeUnit.ARRAY_UNIT) {
+            List<UnitJson> actual = actualJson.getUnitsValue();
             assertEquals(expected, actual);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } else if (actualJson.getType() == TypeUnit.UNIT) {
+            List<UnitJson> actual = actualJson.getUnitsValue();
+            assertEquals(expected, actual);
         }
+
+
     }
 
     @Test
-    public void testHardJson() {
+    public void testHardMinJson() throws JsonException, IOException {
         List<UnitJson> expected = new ArrayList<>();
         expected.add(new UnitJson("name", "resource", UnitJson.TypeValue.STRING));
         expected.add(new UnitJson("version", "3647", UnitJson.TypeValue.NUMBER));
@@ -143,74 +182,20 @@ public class TestJSON {
                 ), UnitJson.TypeValue.UNITS_ARRAY)
         );
 
-        try {
-            Json actualJson = new Json(new File(
-                    Objects.requireNonNull(
-                            getClass()
-                                    .getResource("/json/hard.json")
-                    ).getPath()
-            ));
-            if (actualJson.getType() == TypeUnit.ARRAY_UNIT) {
-                List<UnitJson> actual = actualJson.getUnitsValue();
-                assertEquals(expected, actual);
-            } else if (actualJson.getType() == TypeUnit.UNIT) {
-                List<UnitJson> actual = actualJson.getUnitsValue();
-                assertEquals(expected, actual);
-            }
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test
-    public void testHardMinJson() {
-        List<UnitJson> expected = new ArrayList<>();
-        expected.add(new UnitJson("name", "resource", UnitJson.TypeValue.STRING));
-        expected.add(new UnitJson("version", "3647", UnitJson.TypeValue.NUMBER));
-
-        List<ArrayUnitJson> attachment = new ArrayList<>();
-        attachment.add(new ArrayUnitJson("egeg", UnitJson.TypeValue.STRING));
-        attachment.add(new ArrayUnitJson("575", UnitJson.TypeValue.NUMBER));
-        attachment.add(new ArrayUnitJson(
-                new ValueUnitsJsonList(
-                        null,
-                        TypeUnit.UNIT
-                ), UnitJson.TypeValue.UNITS_ARRAY
+        Json actualJson = new Json(new File(
+                Objects.requireNonNull(
+                        getClass()
+                                .getResource("/json/hard.json")
+                ).getPath()
         ));
-        attachment.add(new ArrayUnitJson(
-                new ValueUnitsJsonList(
-                        null,
-                        TypeUnit.ARRAY_UNIT
-                ), UnitJson.TypeValue.UNITS_ARRAY
-        ));
-
-
-        expected.add(new UnitJson(
-                "dependencies",
-                new ValueUnitsJsonList(
-                        attachment,
-                        TypeUnit.ARRAY_UNIT
-                ), UnitJson.TypeValue.UNITS_ARRAY)
-        );
-
-        try {
-            Json actualJson = new Json(new File(
-                    Objects.requireNonNull(
-                            getClass()
-                                    .getResource("/json/hard.json")
-                    ).getPath()
-            ));
-            if (actualJson.getType() == TypeUnit.ARRAY_UNIT) {
-                List<UnitJson> actual = actualJson.getUnitsValue();
-                assertEquals(expected, actual);
-            } else if (actualJson.getType() == TypeUnit.UNIT) {
-                List<UnitJson> actual = actualJson.getUnitsValue();
-                assertEquals(expected, actual);
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (actualJson.getType() == TypeUnit.ARRAY_UNIT) {
+            List<UnitJson> actual = actualJson.getUnitsValue();
+            assertEquals(expected, actual);
+        } else if (actualJson.getType() == TypeUnit.UNIT) {
+            List<UnitJson> actual = actualJson.getUnitsValue();
+            assertEquals(expected, actual);
         }
+
     }
 }

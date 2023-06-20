@@ -29,5 +29,12 @@ public class ShowBox {
         alert.show();
     }
 
+    public static void showError(String textErr) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(new TranslationTextComponent("showbox.error.title").toString());
+        alert.setHeaderText("showbox.error.headerText");
+        alert.setContentText(textErr.toString());
+        alert.show();
+    }
 
 }

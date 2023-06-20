@@ -1,8 +1,9 @@
 package com.editor.util;
 
 import com.editor.Main;
-import com.editor.util.json.IUnitJson;
-import com.editor.util.json.Json;
+import com.json.IUnitJson;
+import com.json.Json;
+import com.json.JsonException;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,13 +15,16 @@ import java.util.Objects;
 
 public class TranslationTextComponent {
     private static File[] translateFiles;
-    public static File currentTranslation;
 
-
-
+    public static String fileName;
     private final String key;
     private final Object[] arguments;
 
+    private static Json currentJson;
+
+    static {
+        TranslationTextComponent.loadLangs();
+    }
 
     public TranslationTextComponent(String key) {
         this.key = key;
@@ -36,8 +40,15 @@ public class TranslationTextComponent {
      * */
     public static void loadLangs() {
         try {
-            currentTranslation = new File(Objects.requireNonNull(Main.class.getResource("/translate/en_UK.json")).toURI());
+            currentJson = new Json(new File(Objects.requireNonNull(Main.class.getResource("/translate/en_UK.json")).toURI()));
+            fileName = "en_UK.json";
         } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        } catch (JsonException e) {
             e.printStackTrace();
             return;
         }
@@ -54,18 +65,13 @@ public class TranslationTextComponent {
         Arrays.stream(translateFiles).map(File::getName).forEach(System.out::println);
     }
 
-    public static void setCurrentTranslation(File newTrabslation){
-        currentTranslation = newTrabslation;
+    public static void setCurrentTranslation(File newTrabslation) throws IOException, JsonException {
+        currentJson = new Json(newTrabslation);
+        fileName = newTrabslation.getName();
     }
 
-    private String getTranslationFromKey() {
-        Json lang;
-        try {
-            lang = new Json(currentTranslation);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        IUnitJson obj = lang.get(key);
+    private String getTranslationFromKey() throws JsonException {
+        IUnitJson obj = currentJson.get(key);
 
         return obj == null ? key : (String) obj.getValue();
     }
@@ -74,14 +80,20 @@ public class TranslationTextComponent {
     public String toString() {
         if (this.key == null)
             return "null";
-
-        if (this.arguments != null) {
-            return String.format(getTranslationFromKey(), arguments);
+        try {
+            if (this.arguments != null) {
+                return String.format(getTranslationFromKey(), arguments);
+            }
+            return getTranslationFromKey();
+        } catch (JsonException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return getTranslationFromKey();
     }
 
     public static File[] getTranslateFiles() {
         return translateFiles;
     }
+
+
 }

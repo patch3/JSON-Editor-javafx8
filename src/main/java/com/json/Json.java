@@ -1,8 +1,7 @@
-package com.editor.util.json;
+package com.json;
 
 import com.editor.util.Convert;
 import com.editor.util.FileUtils;
-import com.editor.util.Interpreter;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +15,7 @@ public class Json extends ValueUnitsJsonList {
         super();
     }
 
-    public Json(File fileJson) throws IOException {
+    public Json(File fileJson) throws IOException, JsonException {
         this(FileUtils.readFile(fileJson.getAbsolutePath()));
     }
 
@@ -36,7 +35,6 @@ public class Json extends ValueUnitsJsonList {
     }
 
 
-
     /**
      *  разрывает ссылку и выделает память под unit сохраняя его тип
      *  */
@@ -48,8 +46,4 @@ public class Json extends ValueUnitsJsonList {
             return new ArrayUnitJson(obj);
         }
     }
-
-
-
-
 }

@@ -23,7 +23,8 @@ public class Convert {
         char[] chars = string.toCharArray();
         int count = 0;
         for (int i = 0; i < chars.length; ++i, ++count) {
-            if (chars[i] == '"') {
+            char ch = chars[i];
+            if (ch == '"' || ch == '\n' ||  ch == '\t') {
                 ++count;
             }
         }
@@ -37,6 +38,10 @@ public class Convert {
         for (char ch : chars){
             if (ch == '"'){
                 sb.append("\\\"");
+            } else if (ch == '\n'){
+                sb.append("\\\n");
+            } else if (ch == '\t'){
+                sb.append("\\\t");
             } else {
                 sb.append(ch);
             }

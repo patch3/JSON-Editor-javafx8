@@ -1,8 +1,7 @@
-package com.editor.util.json;
+package com.json;
 
 import com.editor.util.Convert;
 import com.sun.istack.internal.Nullable;
-import com.editor.util.Interpreter;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,27 +37,27 @@ public abstract class AbstractElementJson implements IUnitJson {
         this.typeValue = obj.typeValue;
     }
 
-    public int valueInterpreter(char[] chStr, int i) {
+    public int valueInterpreter(char[] chStr, int i) throws JsonException {
         i = Interpreter.skipChar(chStr, i);
         char ch = chStr[i];
         switch (ch) {
             case '"':
                 this.value = Interpreter.string(chStr, i);
                 this.typeValue = TypeValue.STRING;
-                return Convert.countRecord((String)this.value)+i+1;
+                return Convert.countRecord((String) this.value) + i + 2;
             case '{':
                 this.value = new ValueUnitsJsonList();
                 this.typeValue = TypeValue.UNITS_ARRAY;
-                return ((ValueUnitsJsonList) this.value).unitsInterpreter(chStr, i);
+                return ((ValueUnitsJsonList) this.value).unitsInterpreter(chStr, i) + 1;
             case '[':
                 this.value = new ValueUnitsJsonList();
                 this.typeValue = TypeValue.UNITS_ARRAY;
-                return ((ValueUnitsJsonList) this.value).arrayInterpreter(chStr, i);
+                return ((ValueUnitsJsonList) this.value).arrayInterpreter(chStr, i) + 1;
             default:
                 if (Character.isDigit(ch) || ch == '-') {
                     this.value = Interpreter.numberStr(chStr, i);
                     this.typeValue = TypeValue.NUMBER;
-                    return ((String) this.value).length() + i - 1;
+                    return ((String) this.value).length() + i;
                 }
                 throw new JsonException("error.json.exp_value", i );
         }
@@ -74,14 +73,14 @@ public abstract class AbstractElementJson implements IUnitJson {
         return ((ValueUnitsJson)this.value).unitsInterpreter(chStr, i);
     }*/
 
-    public int valueStringInterpreter(char[] chStr, int i) {
+    public int valueStringInterpreter(char[] chStr, int i) throws JsonException {
         if (chStr[i] != '"')
             throw new JsonException("error.json.exp_str", i);
 
         return this.valueStringInterpreterUnSafe(chStr, i);
     }
 
-    protected int valueStringInterpreterUnSafe(char[] chStr, int i) {
+    protected int valueStringInterpreterUnSafe(char[] chStr, int i) throws JsonException {
         this.value = Interpreter.string(chStr, i);
         this.typeValue = TypeValue.STRING;
         return ((String) this.value).length() + 1 + i;
@@ -131,9 +130,10 @@ public abstract class AbstractElementJson implements IUnitJson {
     }
 
     @Override
-    public void setValue(Object value, TypeValue typeValue) {
-        this.typeValue = typeValue;
+    public void setValue(Object value, TypeValue typeValue) throws JsonException {
+
         this.value = value;
+        this.typeValue = typeValue;
     }
 
     public boolean equalsContent(Object o) {

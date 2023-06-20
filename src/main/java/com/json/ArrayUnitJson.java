@@ -1,13 +1,11 @@
-package com.editor.util.json;
+package com.json;
 
 import com.editor.util.Convert;
 
 import java.util.Objects;
 
 public class ArrayUnitJson extends AbstractElementJson {
-    protected int index;
-
-
+    private int index;
     public ArrayUnitJson() {
         super(TypeUnit.ARRAY_UNIT);
     }

@@ -1,6 +1,6 @@
-import org.junit.Test;
 import com.editor.util.FileUtils;
-import com.editor.util.json.*;
+import com.json.*;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TestUnitJson {
     @Test
-    public void testHardIndexOf() throws IOException {
+    public void testHardIndexOf() throws IOException, JsonException {
         Json actualJson = new Json(new File(
                 Objects.requireNonNull(
                         getClass()
@@ -67,12 +67,12 @@ public class TestUnitJson {
     }
 
     @Test
-    public void testHardSetJson() throws IOException {
+    public void testHardSetJson() throws IOException, JsonException {
         String path = Objects.requireNonNull(getClass().getResource("json/hard.json")).getPath().replaceFirst("^/(.:/)", "$1");
 
         Json json = new Json(new File(path));
         IUnitJson expected = new UnitJson("name", "resource", UnitJson.TypeValue.STRING);
-        int[] expectedIndex = {2, 1};
+        int[] expectedIndex = {1};
         json.set(expectedIndex, expected);
 
         IUnitJson actual = json.get(expectedIndex);
@@ -82,7 +82,7 @@ public class TestUnitJson {
     }
 
     @Test
-    public void testHardJsonToString() throws IOException {
+    public void testHardJsonToString() throws IOException, JsonException {
         String path = Objects.requireNonNull(getClass().getResource("json/hard.json")).getPath().replaceFirst("^/(.:/)", "$1");
         String expected = FileUtils.readFile(path);
 

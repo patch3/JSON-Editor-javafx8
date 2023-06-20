@@ -1,12 +1,19 @@
 package com.editor.controller;
 
 
+import com.editor.Main;
 import com.editor.util.FileUtils;
+import com.editor.util.SFTPClient;
+import com.editor.util.ShowBox;
+import com.editor.util.TranslationTextComponent;
+import com.editor.util.directory.Directory;
+import com.editor.util.directory.DirectoryElement;
+import com.editor.util.directory.IDirectory;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
+import com.json.*;
 import com.sun.istack.internal.Nullable;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -16,7 +23,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -28,15 +34,7 @@ import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
-import com.editor.Main;
-import com.editor.util.SFTPClient;
-import com.editor.util.ShowBox;
-import com.editor.util.TranslationTextComponent;
-import com.editor.util.directory.Directory;
-import com.editor.util.directory.DirectoryElement;
-import com.editor.util.directory.IDirectory;
-import com.editor.util.json.*;
+import javafx.util.Callback;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -108,8 +106,7 @@ public class Home {
     private MenuButton infoMenu;
     @FXML
     private MenuButton viewMenu;
-    @FXML
-    private MenuItem infoThisAppItem;
+
     @FXML
     private MenuItem usersGuideItem;
     @FXML
@@ -146,6 +143,43 @@ public class Home {
         this.saveAs.setOnAction(this::eventSaveAs);
         /* __________________ */
 
+
+        this.numCheckBox.setOnAction(event -> {
+            if (this.numCheckBox.isSelected()) {
+                try {
+                    Interpreter.numberStr(this.valueUnitTextArea.getText().toCharArray(), 0);
+                } catch (JsonException ex) {
+                    this.numCheckBox.setSelected(false);
+                    ShowBox.showError(new TranslationTextComponent("error.home.invalid_char_value"));
+                    return;
+                }
+
+                this.textAreaJson.setOnKeyTyped(keyEvent -> {
+                    String input = keyEvent.getCharacter();
+                    // Проверяем, является ли введенный символ числом
+                    if (!input.matches("-?\\d*\\.?\\d*")) {
+                        keyEvent.consume(); // Отменяем ввод символа
+                    }
+                });
+            } else {
+                this.textAreaJson.setOnKeyTyped(null);
+            }
+
+
+
+            /*ChangeListener<String> listener = (observable, oldValue, newValue) -> {
+                if (!newValue.matches("[\\d+-.]*")) {
+                    valueUnitTextArea.setText(newValue.replaceAll("[^\\d+-.]", ""));
+                }
+            };
+            if (numCheckBox.isSelected()) {
+                valueUnitTextArea.textProperty().addListener(listener);
+            } else {
+                valueUnitTextArea.textProperty().removeListener(listener);
+            }*/
+        });
+
+
         this.scene.setOnKeyReleased(this::onKeyReleased);
         /* пункт удаленного подключения */
         this.configureConn.setOnAction(this::eventClickConfigureConn); // открытие окна конфигурации удаленного подключения
@@ -159,7 +193,7 @@ public class Home {
             RadioMenuItem item = new RadioMenuItem(f.getName());
             item.setOnAction(event -> onChangeLanguage(item));
             item.setToggleGroup(group);
-            if (item.getText().equals(TranslationTextComponent.currentTranslation.getName())) {
+            if (item.getText().equals(TranslationTextComponent.fileName)) {
                 group.selectToggle(item);
             }
             language.getItems().add(item);
@@ -171,10 +205,10 @@ public class Home {
         this.directoryTreeView.setOnContextMenuRequested(this::eventDirectoryTreeViewContextMenuRequest);
 
 
-        this.treeView.setCellFactory(param -> createTextFieldTreeCell());
-        this.treeView.setOnEditCommit(this::onEditCommit);
-        this.treeView.setOnMouseClicked(this::onMauseClickTreeView);
-        this.treeView.setOnContextMenuRequested(this::eventTreeViewContextMenuRequest);
+        this.giveEventsTreeViewJson(this.treeView);
+
+        this.usersGuideItem.setOnAction(this::onUsersGuideItemClick);
+
 
         /* панель изменения элементов json */
         this.saveButton.setOnAction(this::onActionSaveButton);
@@ -184,6 +218,62 @@ public class Home {
         this.textEquivalentCheck.setOnAction(this::eventOnActionTextEquivalentCheck);
 
     }
+
+    private void onUsersGuideItemClick(ActionEvent event) {
+        /*try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/users_guide.fxml"));
+            Parent root = loader.load();
+
+            Stage newWindowStage = new Stage();
+            newWindowStage.setScene(new Scene(root));
+            newWindowStage.setMinWidth(200);
+            newWindowStage.setMinHeight(200);
+            newWindowStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
+
+        Stage stage = new Stage();
+        stage.setTitle(new TranslationTextComponent("configure").toString());
+        Parent root = null;
+        try {
+            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/fxml/users_guide.fxml")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (root == null) {
+            return;
+        }
+        stage.setScene(new Scene(root));
+        stage.setMinHeight(200);
+        stage.setMinWidth(200);
+        stage.show();
+    }
+
+    public void giveEventsTreeViewJson(TreeView<IUnitJson> obj) {
+        obj.setCellFactory(new Callback<TreeView<IUnitJson>, TreeCell<IUnitJson>>() {
+            @Override
+            public TreeCell<IUnitJson> call(TreeView<IUnitJson> param) {
+                return new TreeCell<IUnitJson>() {
+                    @Override
+                    protected void updateItem(IUnitJson item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            // Устанавливаем отображаемое имя из getName()
+                            setText(item.getName());
+                        }
+                    }
+                };
+            }
+        });
+        obj.setOnEditCommit(this::onEditCommit);
+        obj.setOnMouseClicked(this::onMauseClickTreeView);
+        obj.setOnContextMenuRequested(this::eventTreeViewContextMenuRequest);
+    }
+
 
     private void eventSaveAs(ActionEvent event) {
         if (this.workFile == null) return;
@@ -228,7 +318,6 @@ public class Home {
         exitProg.setText(new TranslationTextComponent("menu_item.exit.global").toString());
         openLocal.setText(new TranslationTextComponent("menu_item.open.local").toString());
         configureConn.setText(new TranslationTextComponent("menu_item.configure").toString());
-        infoThisAppItem.setText(new TranslationTextComponent("menu_item.information.about.this.app").toString());
         usersGuideItem.setText(new TranslationTextComponent("menu_item.information.guide").toString());
         language.setText(new TranslationTextComponent("menu.language").toString());
         fileMenu.setText(new TranslationTextComponent("menu.file").toString());
@@ -253,25 +342,24 @@ public class Home {
         if (this.textEquivalentCheck.isSelected()) { // если при нажатии флажок нажат
             TextArea textArea = new TextArea();
             // при выделении флажка
-            if (this.treeView.getRoot() == null || this.treeView.getRoot().getChildren().isEmpty()) {
-                if (this.workFile == null) {
-                    this.json = null;
-                    textArea.setEditable(false);
-                }
+            if (this.workFile == null) {
+                this.json = null;
+                textArea.setEditable(false);
+
             } else {
                 if (this.json != null) {
-                    try {
-                        textArea.setText(this.json.toString());
-                    } catch (JsonException ex) {
-                        ShowBox.showError(new TranslationTextComponent("error.json.change.text", ex.getMessage()));
-                    }
+                    //try {
+                    textArea.setText(this.json.toString());
+                    //} catch (JsonException ex) {
+                    //    ShowBox.showError(new TranslationTextComponent("error.json.change.text", ex.getMessage()));
+                    //}
                 } else {
                     this.json = new Json();
                 }
             }
 
             this.textAreaJson = (TextArea) replace((Pane) this.treeView.getParent(), this.treeView, textArea);
-            showJson();
+            this.showJson();
             return;
         }
 
@@ -280,7 +368,9 @@ public class Home {
         } catch (JsonException ex) {
             ShowBox.showError(new TranslationTextComponent("error.json.change.text", ex.getMessage()));
         }
-        this.treeView = (TreeView<IUnitJson>) replace((Pane)this.treeView.getParent(), this.textAreaJson, this.treeView);
+        this.treeView = new TreeView<>();
+        this.giveEventsTreeViewJson(this.treeView);
+        this.treeView = (TreeView<IUnitJson>) replace((Pane) this.textAreaJson.getParent(), this.textAreaJson, this.treeView);
         showJson();
     }
 
@@ -294,7 +384,15 @@ public class Home {
         for (File f : translates) {
             String name = item.getText();
             if (name.equals(f.getName())) {
-                TranslationTextComponent.currentTranslation = f;
+                try {
+                    TranslationTextComponent.setCurrentTranslation(f);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    ShowBox.showError(new TranslationTextComponent("error.load.langs", e.getMessage()));
+                } catch (JsonException e) {
+                    e.printStackTrace();
+                    ShowBox.showError(e.getMessage());
+                }
                 break;
             }
         }
@@ -305,7 +403,8 @@ public class Home {
      * Создания контекстного меню при правом клике по дереву json
      */
     private void eventTreeViewContextMenuRequest(ContextMenuEvent event) {
-        if (this.json == null) return;
+        this.disableChangePanel(true);
+        //if (this.json == null) return;
         TreeItem<IUnitJson> selectedItem = treeView.getSelectionModel().getSelectedItem();
 
         ContextMenu menu = new ContextMenu();
@@ -349,7 +448,7 @@ public class Home {
      * @param typeUnit тип для хранения(только если это список иначе null)
      */
     private void eventAddEmptyUnit(ActionEvent event, TreeItem<IUnitJson> selectedItem, String labelUnit, TypeUnit typeUnit) {
-        if (this.treeView.getRoot() == null || this.treeView.getRoot().getChildren().isEmpty()) {
+        if (this.treeView.getRoot() == null) {
             labelUnit = (typeUnit == TypeUnit.UNIT) ? "[ArrayList]" : "[UnitList]";
             this.treeView.setRoot(
                     new TreeItem<>(
@@ -380,7 +479,7 @@ public class Home {
         if (parentValue.getType() == TypeUnit.UNIT) {
             emptyUnit = new UnitJson(new TranslationTextComponent(labelUnit).toString(), value, type);
         } else {
-            emptyUnit = new ArrayUnitJson(value, type, parentValue.getValue().size());
+            emptyUnit = new ArrayUnitJson(value, type, selectedItem.getChildren().size());
         }
 
         if (selectedItem == treeView.getRoot()) {
@@ -429,19 +528,25 @@ public class Home {
         int[] indexs = this.json.indexOf(selectedUnit);
 
         this.json.delete(indexs);
-        selectedItem.getParent().getValue().getValueList().remove(indexs[indexs.length - 1]);
+        /*if (selectedItem.getParent() == this.treeView.getRoot()){
+            selectedItem.getParent().getChildren().remove(indexs[0]);
+        } else {*/
+        selectedItem.getParent().getChildren().remove(indexs[indexs.length - 1]);
+        //}
         //this.getParentTreeItem(indexs).getChildren().remove(indexs[indexs.length - 1]);
         this.treeView.refresh(); // Обновление TreeView
     }
 
     private void clearTreeView(TreeView<?> treeView) {
         this.json = null;
-        if (this.textEquivalentCheck.isSelected()) {
+        /*if (this.textEquivalentCheck.isSelected()) {
             this.textAreaJson.clear();
         } else {
             this.treeView.setRoot(null);
             this.treeView.refresh();
-        }
+        }*/
+        treeView.setRoot(null);
+        treeView.refresh();
     }
 
     private void eventDirectoryTreeViewContextMenuRequest(ContextMenuEvent event) {
@@ -773,6 +878,10 @@ public class Home {
                     workFile = new File(selectedObject.pathToElement());
                 } catch (IOException e) {
                     e.printStackTrace();
+                    ShowBox.showError(new TranslationTextComponent("error.home.open.json_file"));
+                } catch (JsonException e) {
+                    e.printStackTrace();
+                    ShowBox.showError(e.getMessage());
                 }
             } else {
                 Directory directory = new Directory(selectedObject);
@@ -873,9 +982,12 @@ public class Home {
             this.json = new Json(workFile);
             this.showJson();
         } catch (IOException e) {
-
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            ShowBox.showError(new TranslationTextComponent("error.home.open.json_file"));
+            // TODO Auto-generated catch block
+        } catch (JsonException e) {
+            e.printStackTrace();
+            ShowBox.showError(e.getMessage());
         }
     }
 
@@ -901,24 +1013,23 @@ public class Home {
      */
     private void onEditCommit(TreeView.EditEvent<IUnitJson> event) {
         TreeItem<IUnitJson> editedItem = event.getTreeItem();
-        if (
-            editedItem == null ||
-            editedItem == this.treeView.getRoot() ||
-            editedItem.getValue().getTypeUnit() == TypeUnit.ARRAY_UNIT
-        ) {
-            assert editedItem != null;
-            editedItem.setValue(event.getOldValue());
+        if (editedItem == null ||
+                editedItem == this.treeView.getRoot() ||
+                editedItem.getValue().getTypeUnit() == TypeUnit.ARRAY_UNIT) {
+            if (editedItem != null) {
+                editedItem.setValue(event.getOldValue());
+            }
             return;
         }
 
-        event.getNewValue().setValue(event.getOldValue());
-        int[] index = this.json.indexOf(editedItem.getValue());
-        IUnitJson object = event.getNewValue();
-        object.setValue(event.getNewValue());
-        editedItem.setValue(object);
-        this.json.set(index, object);
+        IUnitJson oldValue = event.getOldValue();
+        IUnitJson newValue = event.getNewValue();
+        if (newValue.getTypeUnit() != TypeUnit.ARRAY_UNIT) {
+            int[] index = this.json.indexOf(oldValue);
+            this.json.set(index, newValue);
 
-        treeView.refresh(); // Обновление TreeView
+            treeView.refresh(); // Обновление TreeView
+        }
     }
 
     private void eventClickOpenLocalFolder(Event event) {
@@ -934,8 +1045,8 @@ public class Home {
 
 
 
-    private TextFieldTreeCell<IUnitJson> createTextFieldTreeCell() {
-        return new TextFieldTreeCell<>(new StringConverter<IUnitJson>() {
+    /*private TextFieldTreeCell<IUnitJson> createTextFieldTreeCell() {
+        TextFieldTreeCell<IUnitJson> obj =  new TextFieldTreeCell<>(new StringConverter<IUnitJson>() {
             @Override
             public String toString(IUnitJson object) {
                 return object != null ? object.getName() : "";
@@ -943,14 +1054,18 @@ public class Home {
 
             @Override
             public IUnitJson fromString(String string) {
+
                 return new UnitJson(string);
             }
         });
-    }
+
+        return obj;
+    }*/
 
 
     public void showJson() {
         disableChangePanel(true);
+
         if (this.json == null) {
             return;
         }
@@ -960,7 +1075,6 @@ public class Home {
             this.textAreaJson.setText(this.json.toString());
             return;
         }
-
         List<IUnitJson> unitList = this.json.getValue();
         UnitJson rootUnit;
         if (this.json.getType() == TypeUnit.UNIT) {
@@ -976,18 +1090,21 @@ public class Home {
                     IUnitJson.TypeValue.UNITS_ARRAY
             );
         } else {
+            System.err.println(treeView);
+            this.treeView.setRoot(null);
             return;
         }
         TreeItem<IUnitJson> rootItem = new TreeItem<>(rootUnit);
         rootItem.setExpanded(true);
         if (unitList != null) {
-            for (IUnitJson iUnitJson : unitList) {
-                if (iUnitJson.getValue() instanceof ValueUnitsJsonList) {
-                    rootItem.getChildren().add(recursionShowJson(iUnitJson));
+            for (IUnitJson unit : unitList) {
+                if (unit.getValue() instanceof ValueUnitsJsonList) {
+                    rootItem.getChildren().add(recursionShowJson(unit));
+                } else {
+                    rootItem.getChildren().add(new TreeItem<IUnitJson>(unit));
                 }
             }
         }
-
         treeView.setRoot(rootItem);
     }
 
@@ -995,9 +1112,11 @@ public class Home {
         TreeItem<IUnitJson> item = new TreeItem<>(obj);
         List<IUnitJson> valueList = obj.getValueList();
         if (valueList != null) {
-            for (IUnitJson iUnitJson : valueList) {
-                if (iUnitJson.getValue() instanceof ValueUnitsJsonList) {
-                    item.getChildren().add(recursionShowJson(iUnitJson));
+            for (IUnitJson unit : valueList) {
+                if (unit.getValue() instanceof ValueUnitsJsonList) {
+                    item.getChildren().add(recursionShowJson(unit));
+                } else {
+                    item.getChildren().add(new TreeItem<IUnitJson>(unit));
                 }
             }
         }
@@ -1031,7 +1150,7 @@ public class Home {
             this.nameUnitTextField.setDisable(this.unitJson.getTypeUnit() == TypeUnit.ARRAY_UNIT);
 
             if (this.unitJson.getValue() instanceof ValueUnitsJsonList) {
-                this.valueUnitTextArea.setDisable(false);
+                this.valueUnitTextArea.setDisable(true);
                 this.numCheckBox.setDisable(true);
                 this.numCheckBox.setSelected(false);
                 if (((ValueUnitsJsonList) this.unitJson.getValue()).getType() == TypeUnit.UNIT) {
@@ -1071,18 +1190,31 @@ public class Home {
     }
 
     private void onActionSaveButton(ActionEvent event) {
-        IUnitJson newUnit = this.unitJson;
-        newUnit.setName(this.nameUnitTextField.getText());
-
-        if (this.numCheckBox.isSelected()) {
-            newUnit.setValue(this.valueUnitTextArea.getText(), IUnitJson.TypeValue.NUMBER);
-        } else {
-            newUnit.setValue(this.valueUnitTextArea.getText(), IUnitJson.TypeValue.STRING);
+        IUnitJson newUnit = Json.newUnit(this.unitJson);
+        if (newUnit.getTypeUnit() == TypeUnit.UNIT) {
+            newUnit.setName(this.nameUnitTextField.getText());
         }
+        try {
+            if (this.numCheckBox.isSelected()) {
 
+                try {
+                    String num = Interpreter.numberStr((this.valueUnitTextArea.getText()).toCharArray(), 0);
+                    newUnit.setValue(num, IUnitJson.TypeValue.NUMBER);
+                } catch (JsonException ex) {
+                    ex.printStackTrace();
+                    ShowBox.showError(ex.getMessage());
+                    return;
+                }
+
+            } else {
+                newUnit.setValue(this.valueUnitTextArea.getText(), IUnitJson.TypeValue.STRING);
+            }
+        } catch (JsonException ex) {
+            ShowBox.showError(ex.getMessage());
+        }
         this.json.set(json.indexOf(this.unitJson), newUnit);
         this.unitJson = newUnit;
-
+        treeView.getSelectionModel().getSelectedItem().setValue(this.unitJson);
         treeView.refresh(); // Обновление TreeView
     }
 
@@ -1090,8 +1222,8 @@ public class Home {
         for (SFTPClient client : SFTPClient.connections) {
             client.disconnect();
         }
-        clearTreeView(directoryTreeView);
-        clearTreeView(treeView);
+        this.clearTreeView(directoryTreeView);
+        this.clearTreeView(treeView);
         jsonIsRemote = false;
         remotePath = "";
     }

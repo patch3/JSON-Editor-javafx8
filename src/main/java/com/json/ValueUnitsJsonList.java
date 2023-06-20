@@ -1,8 +1,6 @@
-package com.editor.util.json;
+package com.json;
 
 
-import com.editor.util.Interpreter;
-import com.editor.util.TranslationTextComponent;
 import org.w3c.dom.ranges.RangeException;
 
 import java.util.*;
@@ -54,7 +52,7 @@ public class ValueUnitsJsonList {
         this.type = type;
     }
 
-    public int unitsInterpreter(char[] chStr, int i) {
+    /*public int unitsInterpreter(char[] chStr, int i) {
         if (chStr[i] != '{') {
             throw new JsonException("error.json.value_list.exp_start_brace");
         }
@@ -118,9 +116,52 @@ public class ValueUnitsJsonList {
             ++i;
         }
         throw new JsonException("error.json.value.unexp_end");
+    }*/
+
+    public int unitsInterpreter(char[] chStr, int i) throws JsonException {
+        if (chStr[i] != '{') {
+            throw new JsonException("error.json.value_list.exp_start_brace");
+        }
+        ++i;
+        List<UnitJson> units = new ArrayList<>();
+        UnitJson unit = new UnitJson();
+        i = Interpreter.skipChar(chStr, i);
+        while (i < chStr.length) {
+            if (chStr[i] == '}') {
+                this.value = this.convertToIUnitJsonList(units);
+                this.type = TypeUnit.UNIT;
+                return i;
+            }
+            try {
+                i = unit.nameInterpreter(chStr, i);
+            } catch (JsonException ex) {
+                throw new JsonException(ex);
+            }
+            i = Interpreter.skipChar(chStr, i);
+            if (chStr[i] == ':') {
+                i = unit.valueInterpreter(chStr, ++i);
+                units.add(unit);
+            } else {
+                throw new JsonException("error.json.exp_value");
+            }
+            i = Interpreter.skipChar(chStr, i);
+            switch (chStr[i]) {
+                case ',':
+                    unit = new UnitJson();
+                    break;
+                case '}':
+                    continue;
+                default:
+                    throw new JsonException("error.json.value_list.exp_start_brace");
+            }
+            ++i;
+            i = Interpreter.skipChar(chStr, i);
+        }
+        throw new JsonException("error.json.value.unexp_end");
     }
 
-    public int arrayInterpreter(char[] chStr, int i) {
+
+   /* public int arrayInterpreter(char[] chStr, int i) {
         if (chStr[i] != '[') {
             throw new JsonException("error.json.value.array_expected", i);
         }
@@ -138,7 +179,6 @@ public class ValueUnitsJsonList {
 
         while (i < chStr.length) {
             char ch = chStr[i];
-
             switch (ch) {
                 case ',':
                     if (postCheckValue) {
@@ -167,15 +207,58 @@ public class ValueUnitsJsonList {
                         postCheckValue = true;
                         i = unit.valueInterpreter(chStr, i);
                         units.add(unit);
-                    } else if (0 < (temp = (Interpreter.skipChar(chStr, i) - 1 - i))) {
-                        i += temp;
                     } else throw new JsonException("error.json.value_list.undefined_entry", i);
                     break;
             }
+            i = Interpreter.skipChar(chStr, i);
             ++i;
         }
         throw new JsonException("error.json.value.unexp_end");
+    }*/
+
+    public int arrayInterpreter(char[] chStr, int i) throws JsonException {
+        if (chStr[i] != '[') {
+            throw new JsonException("error.json.value.array_expected", i);
+        }
+        ++i;
+        int index = 0;
+        i = Interpreter.skipChar(chStr, i);
+        List<ArrayUnitJson> units = new ArrayList<>();
+        ArrayUnitJson unit = new ArrayUnitJson(index);
+        while (i < chStr.length) {
+            if (chStr[i] == ']') {
+                this.value = this.convertToIUnitJsonList(units);
+                this.type = TypeUnit.ARRAY_UNIT;
+                return i;
+            }
+            if (0 <= Arrays.binarySearch(START_VALUE_CHAR, chStr[i])) {
+                i = unit.valueInterpreter(chStr, i);
+                units.add(unit);
+            } else {
+                throw new JsonException("error.json.exp_value", i);
+            }
+            i = Interpreter.skipChar(chStr, i);
+            switch (chStr[i]) {
+                case ',':
+                    unit = new ArrayUnitJson(++index);
+                    break;
+                case ']':
+                    continue;
+                default:
+                    throw new JsonException("error.json.value_list.exp_start_square_bracket", i);
+            }
+            ++i;
+            i = Interpreter.skipChar(chStr, i);
+        }
+        throw new JsonException("error.json.value.unexp_end", i);
     }
+
+    public List<IUnitJson> convertToIUnitJsonList(List<? extends IUnitJson> units) {
+        return units.stream()
+                .map(unitJson -> (IUnitJson) unitJson)
+                .collect(Collectors.toList());
+    }
+
 
     public List<Integer> indexOf(IUnitJson value, List<Integer> result) {
         if (this.value == null) return null;
@@ -253,7 +336,7 @@ public class ValueUnitsJsonList {
                     return;
                 }
                 tempElementUnit = valueList.get(index);
-                if (i == indexs.length - 2 && tempElementUnit.getTypeUnit() != element.getTypeUnit()) {
+                if (i == indexs.length - 2 && ((ValueUnitsJsonList) tempElementUnit.getValue()).getType() != element.getTypeUnit()) {
                     throw new RuntimeException("Stored type does not match " + element.getTypeUnit().toString());
                 }
                 if (tempElementUnit.getTypeValue() == IUnitJson.TypeValue.UNITS_ARRAY) {

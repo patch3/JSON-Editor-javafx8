@@ -1,13 +1,12 @@
-package com.editor.util.json;
+package com.json;
 
 
 import com.editor.util.Convert;
-import com.editor.util.Interpreter;
 
 import java.util.Objects;
 
 public class UnitJson extends AbstractElementJson {
-    protected String name;
+    private String name;
 
     public UnitJson() {
         super(TypeUnit.UNIT);
@@ -57,9 +56,9 @@ public class UnitJson extends AbstractElementJson {
         return Objects.hash(super.hashCodeContent(), name);
     }
 
-    public int nameInterpreter(char[] chStr, int i) {
+    public int nameInterpreter(char[] chStr, int i) throws JsonException {
         this.name = Interpreter.string(chStr, i);
-        return this.name.length() + 1 + i;
+        return this.name.length() + 2 + i;
     }
 
     @Override

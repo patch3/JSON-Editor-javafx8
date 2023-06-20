@@ -1,7 +1,4 @@
-package com.editor.util;
-
-import jdk.nashorn.internal.runtime.regexp.joni.exception.SyntaxException;
-import com.editor.util.json.JsonException;
+package com.json;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -20,30 +17,50 @@ public class Interpreter {
         return i;
     }
 
-    public static String string(char[] chStr, int i) {
+    public static String string(char[] chStr, int i) throws JsonException {
         if (chStr[i] != '"') {
             throw new JsonException("error.interpreter.exp_start_char_str", i);
         }
-        ++i;
         StringBuilder strBuilder = new StringBuilder();
-        while (i < chStr.length) {
-            char c = chStr[i];
-            if (i < chStr.length - 1 && c == '\\' && chStr[i + 1] == '"') {
-                // Если встретился символ обратного слеша перед кавычкой, то добавляем в строку кавычку без экранирования
-                strBuilder.append('"');
-                ++i;
-            } else if (c == '"') {
-                // Если встретилась кавычка, то выходим из цикла
+
+        for (++i; i < chStr.length; i++) {
+            char ch = chStr[i];
+            if (ch == '\\') {
+                if (i < chStr.length - 1) {
+                    char nch = chStr[i + 1];
+                    if (nch == '"' || nch == 'n' || nch == 't') {
+                        strBuilder.append(getEscapedCharacter(nch));
+                        i++;
+                        continue;
+                    }
+                }
+            } else if (ch == '"') {
                 return strBuilder.toString();
-            } else {
-                strBuilder.append(c);
             }
-            ++i;
+
+            strBuilder.append(ch);
         }
-        throw new SyntaxException("Не найден конец строки на индексе " + i);
+
+        throw new JsonException("error.interpreter.exp_end_str");
     }
 
-    public static String numberStr(char[] chStr, int i) {
+    private static char getEscapedCharacter(char ch) {
+        switch (ch) {
+            case '"':
+                return '"';
+            case 'n':
+                return '\n';
+            case 't':
+                return '\t';
+            default:
+                return ch;
+        }
+    }
+
+    public static String numberStr(char[] chStr, int i) throws JsonException {
+        if (chStr.length < 1) {
+            return "";
+        }
         if (!(Character.isDigit(chStr[i]) || chStr[i] == '-')) {
             throw new JsonException("error.interpreter.exp_start_num", i);
         }
@@ -81,8 +98,7 @@ public class Interpreter {
     }
 
 
-
-    public static Number number(char[] chStr, int i) {
+    public static Number number(char[] chStr, int i) throws JsonException {
         if (!(Character.isDigit(chStr[i]) || (chStr[i] == '-'))) {
             throw new JsonException("error.interpreter.exp_start_num", i);
         }
@@ -111,7 +127,7 @@ public class Interpreter {
         }
 
         if (!hasDigit) {
-            throw new JsonException("erroe.interpreter.exp_num", i);
+            throw new JsonException("error.interpreter.exp_num", i);
         }
 
         // Разбираем целую часть числа

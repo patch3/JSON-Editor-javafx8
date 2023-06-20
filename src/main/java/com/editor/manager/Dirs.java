@@ -25,7 +25,7 @@ public class Dirs {
         }
         if ((!workTempDir.exists()) && (!workTempDir.mkdirs()))
             throw new RuntimeException("Рабочая директория не определена(" + workTempDir + ")");
-        _workDir = workTempDir;
+        this._workDir = workTempDir;
     }
 
     public static OS getPlatform() {
@@ -40,12 +40,12 @@ public class Dirs {
     @Override
     public String toString() {
         return "ManagerDirs{" +
-                "_workDir=" + _workDir +
+                "_workDir=" + this._workDir +
                 '}';
     }
 
     public File getWorkDir() {
-        return _workDir;
+        return this._workDir;
     }
 
     public enum OS {

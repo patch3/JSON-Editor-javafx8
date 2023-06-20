@@ -3,8 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="scene" cacheShape="false" minHeight="100.0" minWidth="200.0" prefHeight="400.0"
-            prefWidth="600.0" style="-fx-background-color: #fff;"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="scene" cacheShape="false" minHeight="100.0" minWidth="200.0" prefHeight="544.0"
+            prefWidth="760.0" style="-fx-background-color: #fff;"
             xmlns="http://javafx.com/javafx/8.0.171" fx:controller="com.editor.controller.Home">
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="44.0" prefWidth="600.0"
                 style="-fx-background-color: #243b69;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
@@ -53,7 +53,6 @@
                 <MenuButton fx:id="infoMenu" mnemonicParsing="false" styleClass="MenuButton" text="info"
                             textFill="WHITE">
                     <items>
-                        <MenuItem fx:id="infoThisAppItem" mnemonicParsing="false" text="About this app"/>
                         <MenuItem fx:id="usersGuideItem" mnemonicParsing="false" text="users guide"/>
                     </items>
                     <font>

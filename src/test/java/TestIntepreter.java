@@ -1,5 +1,6 @@
+import com.json.Interpreter;
+import com.json.JsonException;
 import org.junit.Test;
-import com.editor.util.Interpreter;
 
 import static org.junit.Assert.assertEquals;
 
@@ -7,14 +8,14 @@ import static org.junit.Assert.assertEquals;
 public class TestIntepreter {
 
     @Test
-    public void testInterString() {
+    public void testInterString() throws JsonException {
         String testForString = "tjy\"test1\" tyytky tkk";
-        String res = Interpreter.string(testForString.toCharArray(), 4);
+        String res = Interpreter.string(testForString.toCharArray(), 3);
         assertEquals("test1", res);
     }
 
     @Test
-    public void testInterPositive() {
+    public void testInterPositive() throws JsonException {
         String testForPositiveNum = "wqeq32w1234";
         Number res1 = Interpreter.number(testForPositiveNum.toCharArray(), 4);
         assertEquals(32.0, res1);
@@ -23,7 +24,7 @@ public class TestIntepreter {
     }
 
     @Test
-    public void testInterNegative() {
+    public void testInterNegative() throws JsonException {
         String testForNegativeNum = "--sad-dsad-3-24sd23-s-321";
         Number tes1 = Interpreter.number(testForNegativeNum.toCharArray(), 10);
         assertEquals(-3.0, tes1);

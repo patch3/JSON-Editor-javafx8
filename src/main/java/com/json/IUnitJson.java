@@ -1,4 +1,4 @@
-package com.editor.util.json;
+package com.json;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public interface IUnitJson {
 
     void setName(Object name);
 
-    void setValue(Object value, TypeValue type);
+    void setValue(Object value, TypeValue type) throws JsonException;
 
     @Override
     boolean equals(Object o);

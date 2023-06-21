@@ -5,14 +5,20 @@ import com.editor.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class Json extends ValueUnitsJsonList {
 
-    public Json(){
+    public Json() {
         super();
+    }
+
+    public Json(InputStream input) throws JsonException {
+        this((new Scanner(input, "UTF-8")).useDelimiter("\\A").next());
     }
 
     public Json(File fileJson) throws IOException, JsonException {

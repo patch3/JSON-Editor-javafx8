@@ -1,11 +1,11 @@
 package com.editor.controller;
 
 import com.editor.util.TranslationTextComponent;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 
 public class UsersGuide {
@@ -19,7 +19,10 @@ public class UsersGuide {
     @FXML
     public void initialize() {
         this.showText();
-        this.cancelButton.setOnAction(event -> Platform.exit());
+        this.cancelButton.setOnAction(event -> {
+            Stage stage = (Stage) textArea.getScene().getWindow();
+            stage.close();
+        });
     }
 
     private void showText(){

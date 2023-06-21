@@ -7,17 +7,27 @@
         <option name="convertCss2Bin" value="true" />
         <option name="description" value="" />
         <option name="enabledSigning" value="true" />
+        <option name="height" value="544" />
         <option name="htmlPlaceholderId" value="" />
+        <option name="icons">
+          <JavaFxApplicationIcons>
+            <option name="linuxIcon" value="$PROJECT_DIR$/src/main/resources/ico/ico.png" />
+            <option name="macIcon" value="$PROJECT_DIR$/src/main/resources/ico/ico.icns" />
+            <option name="windowsIcon" value="$PROJECT_DIR$/src/main/resources/ico/ico.ico" />
+          </JavaFxApplicationIcons>
+        </option>
         <option name="nativeBundle" value="all" />
-        <option name="title" value="" />
-        <option name="vendor" value="" />
+        <option name="title" value="JSON-Editor" />
+        <option name="vendor" value="ANTARES" />
         <option name="version" value="" />
+        <option name="width" value="760" />
       </options>
     </properties>
     <root id="root">
       <element id="archive" name="JSON_Editor.jar">
         <element id="module-output" name="JSON-Editor" />
       </element>
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/jcraft/jsch/0.1.55/jsch-0.1.55.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

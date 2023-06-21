@@ -14,6 +14,7 @@ import com.jcraft.jsch.SftpException;
 import com.json.*;
 import com.sun.istack.internal.Nullable;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -41,6 +42,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -133,18 +135,28 @@ public class Home {
         this.exitProg.setOnAction(event -> Platform.exit());
         this.exitFile.setOnAction(event -> {
             clearTreeView(this.treeView);
+            valueUnitTextArea.clear();
+            nameUnitTextField.clear();
             this.json = null;
         });
         this.exitFolder.setOnAction(event -> {
             clearTreeView(this.treeView);
             clearTreeView(this.directoryTreeView);
+            valueUnitTextArea.clear();
+            nameUnitTextField.clear();
             this.json = null;
         });
         this.saveAs.setOnAction(this::eventSaveAs);
         /* __________________ */
 
 
+
         this.numCheckBox.setOnAction(event -> {
+            ChangeListener<String> listener = (observable, oldValue, newValue) -> {
+                if (numCheckBox.isSelected() && !newValue.matches("-?\\d*\\.?\\d*")) {
+                    valueUnitTextArea.setText(newValue.replaceAll("[^-\\d.]+", ""));
+                }
+            };
             if (this.numCheckBox.isSelected()) {
                 try {
                     Interpreter.numberStr(this.valueUnitTextArea.getText().toCharArray(), 0);
@@ -153,16 +165,7 @@ public class Home {
                     ShowBox.showError(new TranslationTextComponent("error.home.invalid_char_value"));
                     return;
                 }
-
-                this.textAreaJson.setOnKeyTyped(keyEvent -> {
-                    String input = keyEvent.getCharacter();
-                    // Проверяем, является ли введенный символ числом
-                    if (!input.matches("-?\\d*\\.?\\d*")) {
-                        keyEvent.consume(); // Отменяем ввод символа
-                    }
-                });
-            } else {
-                this.textAreaJson.setOnKeyTyped(null);
+                this.valueUnitTextArea.textProperty().addListener(listener);
             }
 
 
@@ -187,13 +190,32 @@ public class Home {
         this.disconnect.setOnAction(event -> disconnect()); // отключиться
         /* __________________ */
 
-        ToggleGroup group = new ToggleGroup();
+        /*ToggleGroup group = new ToggleGroup();
         File[] translates = TranslationTextComponent.getTranslateFiles();
+
         for (File f : translates) {
-            RadioMenuItem item = new RadioMenuItem(f.getName());
+            String itemName = f.getName();
+            RadioMenuItem item = new RadioMenuItem(itemName);
             item.setOnAction(event -> onChangeLanguage(item));
             item.setToggleGroup(group);
-            if (item.getText().equals(TranslationTextComponent.fileName)) {
+
+            if (itemName.equals(TranslationTextComponent.fileName)) {
+                group.selectToggle(item);
+            }
+
+            language.getItems().add(item);
+        }*/
+
+        ToggleGroup group = new ToggleGroup();
+        List<String> languages = TranslationTextComponent.getLanguages();
+        System.out.println(Arrays.toString(new List[]{languages}));
+
+        for (String name : languages) {
+            RadioMenuItem item = new RadioMenuItem(name);
+            item.setOnAction(event -> onChangeLanguage(item));
+            item.setToggleGroup(group);
+
+            if (name.equals(TranslationTextComponent.fileName)) {
                 group.selectToggle(item);
             }
             language.getItems().add(item);
@@ -380,21 +402,11 @@ public class Home {
      * @param item
      */
     private void onChangeLanguage(RadioMenuItem item) {
-        File[] translates = TranslationTextComponent.getTranslateFiles();
-        for (File f : translates) {
-            String name = item.getText();
-            if (name.equals(f.getName())) {
-                try {
-                    TranslationTextComponent.setCurrentTranslation(f);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    ShowBox.showError(new TranslationTextComponent("error.load.langs", e.getMessage()));
-                } catch (JsonException e) {
-                    e.printStackTrace();
-                    ShowBox.showError(e.getMessage());
-                }
-                break;
-            }
+        try {
+            TranslationTextComponent.setCurrentTranslation(item.getText());
+        } catch (JsonException e) {
+            e.printStackTrace();
+            ShowBox.showError(e.getMessage());
         }
         this.setText();
     }
@@ -650,7 +662,6 @@ public class Home {
     private void eventCreateDirectory(ActionEvent event) {
         TreeItem<IDirectory> selectedItem = directoryTreeView.getSelectionModel().getSelectedItem();
 
-
         IDirectory selectedElement = selectedItem.getValue();
 
         Stage stage = new Stage();
@@ -689,7 +700,7 @@ public class Home {
                 try {
                     File f = new File( selectedElement.pathToElement() + File.separator + field.getText());
                     f.mkdirs();
-                    this.fillTree(directoryTreeView.getSelectionModel().getSelectedItem(), new Directory(f));
+                    this.fillTree(selectedItem, new Directory(new File(selectedElement.pathToElement())));
                 } catch (Exception e) {
                     ShowBox.showError(new TranslationTextComponent("error.create.dir", e.getMessage()));
                     e.printStackTrace();
@@ -774,8 +785,7 @@ public class Home {
             stage.show();
         } else {
             eventClickCreateLocal(null, new File(idir.pathToElement()));
-            this.fillTree(directoryTreeView.getSelectionModel().getSelectedItem(), new Directory((DirectoryElement) directoryTreeView.getSelectionModel().getSelectedItem().getValue()));
-
+            this.fillTree(directoryTreeView.getSelectionModel().getSelectedItem(), new Directory(new File(directoryTreeView.getSelectionModel().getSelectedItem().getValue().pathToElement())));
         }
     }
 

@@ -92,7 +92,7 @@ public class Interpreter {
             i++;
         }
         if (!hasDigit) {
-            throw new JsonException("erroe.interpreter.exp_num", i);
+            throw new JsonException("error.interpreter.exp_num", i);
         }
         return numBuilder.toString();
     }

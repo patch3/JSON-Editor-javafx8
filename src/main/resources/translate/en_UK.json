@@ -23,7 +23,7 @@
   "error.interpreter.exp_start_char_str": "Expected start of string character [\"]",
   "error.interpreter.exp_start_num": "Expected start of number",
   "error.interpreter.exp_num_after_dot": "Expected number after dot",
-  "erroe.interpreter.exp_num": "Expected number",
+  "error.interpreter.exp_num": "Expected number",
   "error.interpreter.exp_end_str": "Expected end of string",
   "error.load.langs": "Error loading language %s",
   "error.home.open.json_file": "Error opening file",

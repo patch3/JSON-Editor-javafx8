@@ -43,19 +43,6 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-
-    /*@Override
-    public void start(Stage primaryStage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/test.fxml"));
-        Parent root = loader.load();
-
-        Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.setMinHeight(310);
-        primaryStage.setMinWidth(400);
-        primaryStage.show();
-    }*/
-
     /**
      * При закрытии проложения
      */

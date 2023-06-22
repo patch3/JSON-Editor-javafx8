@@ -23,7 +23,7 @@
   "error.interpreter.exp_start_char_str": "Ожидался начальный символ строки [\"]",
   "error.interpreter.exp_start_num": "Ожидалось начало числа",
   "error.interpreter.exp_num_after_dot": "Ожидалось число после точки",
-  "erroe.interpreter.exp_num": "Ожидалось число",
+  "error.interpreter.exp_num": "Ожидалось число",
   "error.interpreter.exp_end_str": "Ожидался конец строки",
   "error.load.langs": "Ошибка при загрузке языка %s",
   "error.home.open.json_file": "Ошибка открытия файла",

@@ -52,71 +52,6 @@ public class ValueUnitsJsonList {
         this.type = type;
     }
 
-    /*public int unitsInterpreter(char[] chStr, int i) {
-        if (chStr[i] != '{') {
-            throw new JsonException("error.json.value_list.exp_start_brace");
-        }
-        ++i;
-        boolean start = true;
-        boolean postCheckName = false;
-        boolean postCheckValue = false;
-        boolean postCheckComma = false;
-
-        int temp;
-
-        List<UnitJson> units = new ArrayList<>();
-        UnitJson unit = new UnitJson();
-
-        while (i < chStr.length) {
-            char ch = chStr[i];
-
-            switch (ch) {
-                case '}':
-                    if (postCheckValue) {
-                        this.value = units.stream()
-                                .map(unitJson -> (IUnitJson) unitJson)
-                                .collect(Collectors.toList());
-                        this.type = TypeUnit.UNIT;
-                        return i;
-                    } else if (start) {
-                        this.value = new ArrayList<>();
-                        this.type = TypeUnit.UNIT;
-                        return i;
-                    }
-                case ':':
-                    if (postCheckName) {
-                        postCheckName = false;
-                        postCheckValue = true;
-                        i = unit.valueInterpreter(chStr, ++i);
-                        units.add(unit);
-                        break;
-                    }
-                case ',':
-                    if (postCheckValue) {
-                        postCheckValue = false;
-                        postCheckComma = true;
-                        unit = new UnitJson();
-                        break;
-                    }
-                case '"':
-                    if (postCheckComma || start) {
-                        if (start) start = false;
-                        postCheckComma = false;
-                        postCheckName = true;
-                        i = unit.nameInterpreter(chStr, i);
-                        break;
-                    }
-                default:
-                    if (0 < (temp = (Interpreter.skipChar(chStr, i) - 1))) {
-                        i = temp;
-                        break;
-                    } else
-                        throw new JsonException("error.json.unexp_char", i);
-            }
-            ++i;
-        }
-        throw new JsonException("error.json.value.unexp_end");
-    }*/
 
     public int unitsInterpreter(char[] chStr, int i) throws JsonException {
         if (chStr[i] != '{') {
@@ -159,62 +94,6 @@ public class ValueUnitsJsonList {
         }
         throw new JsonException("error.json.value.unexp_end");
     }
-
-
-   /* public int arrayInterpreter(char[] chStr, int i) {
-        if (chStr[i] != '[') {
-            throw new JsonException("error.json.value.array_expected", i);
-        }
-        ++i;
-        boolean start = true;
-        boolean postCheckValue = false;
-        boolean checkValue = true;
-
-        int index = 0;
-
-        int temp;
-
-        List<ArrayUnitJson> units = new ArrayList<>();
-        ArrayUnitJson unit = new ArrayUnitJson(index);
-
-        while (i < chStr.length) {
-            char ch = chStr[i];
-            switch (ch) {
-                case ',':
-                    if (postCheckValue) {
-                        checkValue = true;
-                        postCheckValue = false;
-                        unit = new ArrayUnitJson(++index);
-                    }
-                    break;
-                case ']':
-                    if (postCheckValue) {
-                        this.value = units.stream()
-                                .map(unitJson -> (IUnitJson) unitJson)
-                                .collect(Collectors.toList());
-                        this.type = TypeUnit.ARRAY_UNIT;
-                        return i;
-                    } else if (start) {
-                        this.value = new ArrayList<>();
-                        this.type = TypeUnit.ARRAY_UNIT;
-                        return i;
-                    }
-                    break;
-                default:
-                    if (0 <= Arrays.binarySearch(START_VALUE_CHAR, chStr[i]) && checkValue) {
-                        if (start) start = false;
-                        checkValue = false;
-                        postCheckValue = true;
-                        i = unit.valueInterpreter(chStr, i);
-                        units.add(unit);
-                    } else throw new JsonException("error.json.value_list.undefined_entry", i);
-                    break;
-            }
-            i = Interpreter.skipChar(chStr, i);
-            ++i;
-        }
-        throw new JsonException("error.json.value.unexp_end");
-    }*/
 
     public int arrayInterpreter(char[] chStr, int i) throws JsonException {
         if (chStr[i] != '[') {

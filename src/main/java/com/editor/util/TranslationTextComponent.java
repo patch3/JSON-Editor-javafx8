@@ -48,32 +48,6 @@ public class TranslationTextComponent {
         this.key = key;
         this.arguments = args;
     }
-
-    /**
-     * Подгрузить выбранный язык
-     */
-    //public static void loadLangs() {
-        /*try {
-            URL url = TranslationTextComponent.class.getResource("/translate");
-            if (url == null) {
-                throw new FileNotFoundException("Language directory does not exist.");
-            }
-            System.out.println("path - " + url.getPath() + ";\n file - " + url.getFile() + ";\n string - " + url.toString() + ";\n ExternalForm - " + url.toExternalForm() + ";\n url - " + url.toURI());
-            File langDir = new File(url.getFile());
-            System.out.println("\n \n path - " + langDir);
-            if (!langDir.exists())
-                throw new UnsupportedOperationException("Cannot access language directory: " + url);
-
-            TranslationTextComponent.translateFiles = langDir.listFiles();
-            System.out.println("The following languages have been loaded: ");
-            Arrays.stream(translateFiles).map(File::getName).forEach(System.out::println);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to access language directory");
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }*/
-    //}
     public static List<String> getLanguages() {
         List<String> languages = new ArrayList<String>();
         ClassLoader classLoader = TranslationTextComponent.class.getClassLoader();

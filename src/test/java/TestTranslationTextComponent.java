@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import static org.junit.Assert.assertEquals;
 
 public class TestTranslationTextComponent {
-
     @Test
     public void testTranslateRu() throws IOException, URISyntaxException, JsonException {
         TranslationTextComponent.setCurrentTranslation("ru_RU.json");
@@ -16,6 +15,4 @@ public class TestTranslationTextComponent {
         String actual = new TranslationTextComponent("error.interpreter.exp_start_char_str").toString();
         assertEquals("Ожидался начальный символ строки [\"]", actual);
     }
-
 }
-//"error.json.exp_str": "Ожидалась строка"

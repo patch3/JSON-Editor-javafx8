@@ -63,16 +63,6 @@ public abstract class AbstractElementJson implements IUnitJson {
         }
     }
 
-
-
-
-
-    /*protected int valueUnitsInterpreter(char[] chStr, int i) {
-        this.value = new ValueUnitsJson();
-        this.typeValue = TypeValue.UNITS_ARRAY;
-        return ((ValueUnitsJson)this.value).unitsInterpreter(chStr, i);
-    }*/
-
     public int valueStringInterpreter(char[] chStr, int i) throws JsonException {
         if (chStr[i] != '"')
             throw new JsonException("error.json.exp_str", i);
@@ -85,12 +75,6 @@ public abstract class AbstractElementJson implements IUnitJson {
         this.typeValue = TypeValue.STRING;
         return ((String) this.value).length() + 1 + i;
     }
-
-    /*protected int valueDigitInterpreter(char[] chStr, int i) {
-        this.value = Interpreter.numberStr(chStr, i);
-        this.typeValue = TypeValue.NUMBER;
-        return ((String)this.value).length() + i;
-    }*/
 
     public String getStringValue() throws RuntimeException {
         if (this.typeValue != TypeValue.STRING) {

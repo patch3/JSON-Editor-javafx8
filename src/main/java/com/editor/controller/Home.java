@@ -14,7 +14,6 @@ import com.jcraft.jsch.SftpException;
 import com.json.*;
 import com.sun.istack.internal.Nullable;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -152,34 +151,20 @@ public class Home {
 
 
         this.numCheckBox.setOnAction(event -> {
-            ChangeListener<String> listener = (observable, oldValue, newValue) -> {
-                if (numCheckBox.isSelected() && !newValue.matches("-?\\d*\\.?\\d*")) {
-                    valueUnitTextArea.setText(newValue.replaceAll("[^-\\d.]+", ""));
-                }
-            };
+            /* ChangeListener<String> listener =*/
             if (this.numCheckBox.isSelected()) {
                 try {
-                    Interpreter.numberStr(this.valueUnitTextArea.getText().toCharArray(), 0);
+                    Interpreter.number(this.valueUnitTextArea.getText().toCharArray(), 0);
                 } catch (JsonException ex) {
                     this.numCheckBox.setSelected(false);
                     ShowBox.showError(new TranslationTextComponent("error.home.invalid_char_value"));
-                    return;
                 }
-                this.valueUnitTextArea.textProperty().addListener(listener);
             }
-
-
-
-            /*ChangeListener<String> listener = (observable, oldValue, newValue) -> {
-                if (!newValue.matches("[\\d+-.]*")) {
-                    valueUnitTextArea.setText(newValue.replaceAll("[^\\d+-.]", ""));
-                }
-            };
-            if (numCheckBox.isSelected()) {
-                valueUnitTextArea.textProperty().addListener(listener);
-            } else {
-                valueUnitTextArea.textProperty().removeListener(listener);
-            }*/
+        });
+        this.valueUnitTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (numCheckBox.isSelected() && !newValue.matches("-?\\d*\\.?\\d*")) {
+                valueUnitTextArea.setText(newValue.replaceAll("[^-\\d.]+", ""));
+            }
         });
 
 
@@ -190,21 +175,6 @@ public class Home {
         this.disconnect.setOnAction(event -> disconnect()); // отключиться
         /* __________________ */
 
-        /*ToggleGroup group = new ToggleGroup();
-        File[] translates = TranslationTextComponent.getTranslateFiles();
-
-        for (File f : translates) {
-            String itemName = f.getName();
-            RadioMenuItem item = new RadioMenuItem(itemName);
-            item.setOnAction(event -> onChangeLanguage(item));
-            item.setToggleGroup(group);
-
-            if (itemName.equals(TranslationTextComponent.fileName)) {
-                group.selectToggle(item);
-            }
-
-            language.getItems().add(item);
-        }*/
 
         ToggleGroup group = new ToggleGroup();
         List<String> languages = TranslationTextComponent.getLanguages();
@@ -242,19 +212,6 @@ public class Home {
     }
 
     private void onUsersGuideItemClick(ActionEvent event) {
-        /*try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/users_guide.fxml"));
-            Parent root = loader.load();
-
-            Stage newWindowStage = new Stage();
-            newWindowStage.setScene(new Scene(root));
-            newWindowStage.setMinWidth(200);
-            newWindowStage.setMinHeight(200);
-            newWindowStage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-
         Stage stage = new Stage();
         stage.setTitle(new TranslationTextComponent("configure").toString());
         Parent root = null;
@@ -370,11 +327,7 @@ public class Home {
 
             } else {
                 if (this.json != null) {
-                    //try {
                     textArea.setText(this.json.toString());
-                    //} catch (JsonException ex) {
-                    //    ShowBox.showError(new TranslationTextComponent("error.json.change.text", ex.getMessage()));
-                    //}
                 } else {
                     this.json = new Json();
                 }
@@ -540,9 +493,6 @@ public class Home {
         int[] indexs = this.json.indexOf(selectedUnit);
 
         this.json.delete(indexs);
-        /*if (selectedItem.getParent() == this.treeView.getRoot()){
-            selectedItem.getParent().getChildren().remove(indexs[0]);
-        } else {*/
         selectedItem.getParent().getChildren().remove(indexs[indexs.length - 1]);
         //}
         //this.getParentTreeItem(indexs).getChildren().remove(indexs[indexs.length - 1]);
@@ -597,27 +547,6 @@ public class Home {
         menu.show(scene.getScene().getWindow(), event.getScreenX(), event.getScreenY());
     }
 
-    /*private TreeItem<IUnitJson> getParentTreeItem(int[] indexes) {
-        TreeItem<IUnitJson> tempElementItem = this.treeView.getTreeItem(0);
-        ObservableList<TreeItem<IUnitJson>> treeItemList = tempElementItem.getChildren();
-        for (int i = 0; i < indexes.length; ++i) {
-            int index = indexes[i];
-            if (index >= 0 && index < treeItemList.size()) {
-                if (i == indexes.length - 1) {
-                    return tempElementItem;
-                }
-                tempElementItem = treeItemList.get(index);
-                if (tempElementItem.getChildren() != null) {
-                    treeItemList = tempElementItem.getChildren();
-                } else {
-                    throw new RuntimeException("Child list is null");
-                }
-            } else {
-                throw new RuntimeException("Invalid index");
-            }
-        }
-        throw new RuntimeException("Unable to get parent");
-    }*/
 
     private void deleteJsonRemote(String pathToElement) throws SftpException, JSchException {
         SFTPClient client = new SFTPClient(ConfigureConn.savedHostname, ConfigureConn.savedPort, ConfigureConn.savedUsername, ConfigureConn.savedPassword);
@@ -1055,22 +984,6 @@ public class Home {
 
 
 
-    /*private TextFieldTreeCell<IUnitJson> createTextFieldTreeCell() {
-        TextFieldTreeCell<IUnitJson> obj =  new TextFieldTreeCell<>(new StringConverter<IUnitJson>() {
-            @Override
-            public String toString(IUnitJson object) {
-                return object != null ? object.getName() : "";
-            }
-
-            @Override
-            public IUnitJson fromString(String string) {
-
-                return new UnitJson(string);
-            }
-        });
-
-        return obj;
-    }*/
 
 
     public void showJson() {
@@ -1205,28 +1118,41 @@ public class Home {
             newUnit.setName(this.nameUnitTextField.getText());
         }
         try {
-            if (this.numCheckBox.isSelected()) {
-
-                try {
-                    String num = Interpreter.numberStr((this.valueUnitTextArea.getText()).toCharArray(), 0);
-                    newUnit.setValue(num, IUnitJson.TypeValue.NUMBER);
-                } catch (JsonException ex) {
-                    ex.printStackTrace();
-                    ShowBox.showError(ex.getMessage());
-                    return;
+            if (newUnit.getTypeValue() != IUnitJson.TypeValue.UNITS_ARRAY) {
+                if (this.numCheckBox.isSelected()) {
+                    try {
+                        String num = Interpreter.numberStr((this.valueUnitTextArea.getText()).toCharArray(), 0);
+                        newUnit.setValue(num, IUnitJson.TypeValue.NUMBER);
+                    } catch (JsonException ex) {
+                        ex.printStackTrace();
+                        ShowBox.showError(ex.getMessage());
+                        return;
+                    }
+                } else {
+                    newUnit.setValue(this.valueUnitTextArea.getText(), IUnitJson.TypeValue.STRING);
                 }
-
-            } else {
-                newUnit.setValue(this.valueUnitTextArea.getText(), IUnitJson.TypeValue.STRING);
             }
         } catch (JsonException ex) {
             ShowBox.showError(ex.getMessage());
         }
-        this.json.set(json.indexOf(this.unitJson), newUnit);
+        int indexs[] = json.indexOf(this.unitJson);
+        this.json.set(indexs, newUnit);
+
+
+        this.treeView.getSelectionModel().getSelectedItem().setValue(this.unitJson);
+
+
+        TreeItem<IUnitJson> selected = this.treeView.getSelectionModel().getSelectedItem();
+
+        selected.setValue(newUnit);
+        if (newUnit.getTypeValue() == IUnitJson.TypeValue.UNITS_ARRAY) {
+            selected.getParent().getChildren().set(indexs[indexs.length - 1], this.recursionShowJson(newUnit));
+        }//selected.getParent().getChildren().clear();
+
         this.unitJson = newUnit;
-        treeView.getSelectionModel().getSelectedItem().setValue(this.unitJson);
-        treeView.refresh(); // Обновление TreeView
+        this.treeView.refresh(); // Обновление TreeView
     }
+
 
     private void disconnect() {
         for (SFTPClient client : SFTPClient.connections) {

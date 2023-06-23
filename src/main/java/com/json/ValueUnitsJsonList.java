@@ -168,14 +168,13 @@ public class ValueUnitsJsonList {
         return null;
     }
 
-    public IUnitJson get(String name) throws JsonException {
+    public IUnitJson get(String name) {
         if (name == null) {
             throw new IllegalArgumentException("Name cannot be null");
         }
         if (this.value == null) return null;
         int size = this.value.size();
-        for (int i = 0; i < size; i++) {
-            IUnitJson unit = this.value.get(i);
+        for (IUnitJson unit : this.value) {
             String unitName = unit.getName();
             if (name.equals(unitName)) {
                 return unit;

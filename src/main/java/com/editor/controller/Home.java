@@ -124,7 +124,6 @@ public class Home {
     @FXML
     public void initialize() {
         this.setText();
-
         /* _______Menu________ */
         /* пункт файл */
         this.openLocal.setOnAction(this::eventClickOpen); // открытие файла локально на пк
@@ -148,17 +147,10 @@ public class Home {
         this.saveAs.setOnAction(this::eventSaveAs);
         /* __________________ */
 
-
-
         this.numCheckBox.setOnAction(event -> {
-            /* ChangeListener<String> listener =*/
-            if (this.numCheckBox.isSelected()) {
-                try {
-                    Interpreter.number(this.valueUnitTextArea.getText().toCharArray(), 0);
-                } catch (JsonException ex) {
-                    this.numCheckBox.setSelected(false);
-                    ShowBox.showError(new TranslationTextComponent("error.home.invalid_char_value"));
-                }
+            if (this.numCheckBox.isSelected() && !Interpreter.isNumber(this.valueUnitTextArea.getText())) {
+                this.numCheckBox.setSelected(false);
+                ShowBox.showError(new TranslationTextComponent("error.home.invalid_char_value"));
             }
         });
         this.valueUnitTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -184,7 +176,6 @@ public class Home {
             RadioMenuItem item = new RadioMenuItem(name);
             item.setOnAction(event -> onChangeLanguage(item));
             item.setToggleGroup(group);
-
             if (name.equals(TranslationTextComponent.fileName)) {
                 group.selectToggle(item);
             }
@@ -324,7 +315,6 @@ public class Home {
             if (this.workFile == null) {
                 this.json = null;
                 textArea.setEditable(false);
-
             } else {
                 if (this.json != null) {
                     textArea.setText(this.json.toString());
@@ -332,7 +322,6 @@ public class Home {
                     this.json = new Json();
                 }
             }
-
             this.textAreaJson = (TextArea) replace((Pane) this.treeView.getParent(), this.treeView, textArea);
             this.showJson();
             return;
@@ -369,7 +358,6 @@ public class Home {
      */
     private void eventTreeViewContextMenuRequest(ContextMenuEvent event) {
         this.disableChangePanel(true);
-        //if (this.json == null) return;
         TreeItem<IUnitJson> selectedItem = treeView.getSelectionModel().getSelectedItem();
 
         ContextMenu menu = new ContextMenu();
@@ -494,19 +482,11 @@ public class Home {
 
         this.json.delete(indexs);
         selectedItem.getParent().getChildren().remove(indexs[indexs.length - 1]);
-        //}
-        //this.getParentTreeItem(indexs).getChildren().remove(indexs[indexs.length - 1]);
         this.treeView.refresh(); // Обновление TreeView
     }
 
     private void clearTreeView(TreeView<?> treeView) {
         this.json = null;
-        /*if (this.textEquivalentCheck.isSelected()) {
-            this.textAreaJson.clear();
-        } else {
-            this.treeView.setRoot(null);
-            this.treeView.refresh();
-        }*/
         treeView.setRoot(null);
         treeView.refresh();
     }
@@ -1024,7 +1004,7 @@ public class Home {
                 if (unit.getValue() instanceof ValueUnitsJsonList) {
                     rootItem.getChildren().add(recursionShowJson(unit));
                 } else {
-                    rootItem.getChildren().add(new TreeItem<IUnitJson>(unit));
+                    rootItem.getChildren().add(new TreeItem<>(unit));
                 }
             }
         }
@@ -1039,7 +1019,7 @@ public class Home {
                 if (unit.getValue() instanceof ValueUnitsJsonList) {
                     item.getChildren().add(recursionShowJson(unit));
                 } else {
-                    item.getChildren().add(new TreeItem<IUnitJson>(unit));
+                    item.getChildren().add(new TreeItem<>(unit));
                 }
             }
         }
@@ -1117,25 +1097,22 @@ public class Home {
         if (newUnit.getTypeUnit() == TypeUnit.UNIT) {
             newUnit.setName(this.nameUnitTextField.getText());
         }
-        try {
-            if (newUnit.getTypeValue() != IUnitJson.TypeValue.UNITS_ARRAY) {
-                if (this.numCheckBox.isSelected()) {
-                    try {
-                        String num = Interpreter.numberStr((this.valueUnitTextArea.getText()).toCharArray(), 0);
-                        newUnit.setValue(num, IUnitJson.TypeValue.NUMBER);
-                    } catch (JsonException ex) {
-                        ex.printStackTrace();
-                        ShowBox.showError(ex.getMessage());
-                        return;
-                    }
-                } else {
-                    newUnit.setValue(this.valueUnitTextArea.getText(), IUnitJson.TypeValue.STRING);
+        if (newUnit.getTypeValue() != IUnitJson.TypeValue.UNITS_ARRAY) {
+            if (this.numCheckBox.isSelected()) {
+                try {
+                    String num = Interpreter.numberStr((this.valueUnitTextArea.getText()).toCharArray(), 0);
+                    newUnit.setValue(num, IUnitJson.TypeValue.NUMBER);
+                } catch (JsonException ex) {
+                    ex.printStackTrace();
+                    ShowBox.showError(ex.getMessage());
+                    return;
                 }
+            } else {
+                newUnit.setValue(this.valueUnitTextArea.getText(), IUnitJson.TypeValue.STRING);
             }
-        } catch (JsonException ex) {
-            ShowBox.showError(ex.getMessage());
         }
-        int indexs[] = json.indexOf(this.unitJson);
+
+        int[] indexs = json.indexOf(this.unitJson);
         this.json.set(indexs, newUnit);
 
 

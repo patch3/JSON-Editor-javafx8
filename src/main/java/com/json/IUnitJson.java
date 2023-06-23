@@ -17,7 +17,7 @@ public interface IUnitJson {
 
     void setName(Object name);
 
-    void setValue(Object value, TypeValue type) throws JsonException;
+    void setValue(Object value, TypeValue type);
 
     @Override
     boolean equals(Object o);

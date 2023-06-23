@@ -70,7 +70,6 @@ public class Interpreter {
         boolean hasDigit = false;
         boolean isNegative = false;
 
-
         while (i < chStr.length) {
             char c = chStr[i];
 
@@ -167,4 +166,28 @@ public class Interpreter {
         return result;
     }
 
+    /**
+     * Является ли строка числом
+     * @param input предполагается число
+     * @return true если это число
+     */
+    public static boolean isNumber(String input) {
+        /*// Удаляем все пробелы из строки
+        input = input.replaceAll("\\s", "");*/
+        // Проверяем наличие минуса в начале строки
+        boolean hasLeadingMinus = input.startsWith("-");
+        // Удаляем минус, если он присутствует в начале строки
+        if (hasLeadingMinus) {
+            input = input.substring(1);
+        }
+        // Проверяем наличие запятой между числами
+        boolean hasCommaBetweenNumbers = input.matches(".*\\d,\\d.*");
+        // Удаляем запятую, если она присутствует между числами
+        if (hasCommaBetweenNumbers) {
+            input = input.replaceAll(",", "");
+        }
+        // Проверяем, является ли оставшаяся часть строки числом
+        boolean isNumeric = input.matches("-?\\d+(\\.\\d+)?");
+        return isNumeric && !hasCommaBetweenNumbers && (!hasLeadingMinus || input.startsWith("-"));
+    }
 }

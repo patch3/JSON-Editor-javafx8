@@ -49,7 +49,7 @@ public class TranslationTextComponent {
         this.arguments = args;
     }
     public static List<String> getLanguages() {
-        List<String> languages = new ArrayList<String>();
+        List<String> languages = new ArrayList<>();
         ClassLoader classLoader = TranslationTextComponent.class.getClassLoader();
         try {
             Enumeration<URL> resources = classLoader.getResources("translate");
@@ -95,7 +95,7 @@ public class TranslationTextComponent {
         fileName = newTrabslationName;
     }
 
-    private String getTranslationFromKey() throws JsonException {
+    private String getTranslationFromKey() {
         IUnitJson obj = currentJson.get(key);
         return obj == null ? key : (String) obj.getValue();
     }
@@ -104,15 +104,10 @@ public class TranslationTextComponent {
     public String toString() {
         if (this.key == null)
             return "null";
-        try {
-            if (this.arguments != null) {
-                return String.format(getTranslationFromKey(), arguments);
-            }
-            return getTranslationFromKey();
-        } catch (JsonException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+        if (this.arguments != null) {
+            return String.format(getTranslationFromKey(), arguments);
         }
+        return getTranslationFromKey();
     }
 
 

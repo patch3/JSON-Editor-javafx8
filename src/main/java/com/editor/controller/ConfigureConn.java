@@ -15,7 +15,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,8 +29,6 @@ public class ConfigureConn {
     public static int savedPort;
     public static String savedUsername;
     public static String savedPassword;
-    @FXML
-    private AnchorPane configureConnScene;
     @FXML
     private Button saveButton;
     @FXML
@@ -145,7 +142,7 @@ public class ConfigureConn {
     }
 
     private void eventClickOnCheck(ActionEvent event) {
-        if (!checkInputCorrect()) return;
+        if (checkInputUnCorrect()) return;
 
         SFTPClient client = new SFTPClient(hostName.getText(), Integer.parseInt(port.getText()), userName.getText(), password.getText());
         try {
@@ -162,7 +159,7 @@ public class ConfigureConn {
     }
 
     public void eventClickOnSave(Event event) {
-        if (!checkInputCorrect()) return;
+        if (checkInputUnCorrect()) return;
 
         savedHostname = hostName.getText();
         savedPort = Integer.parseInt(port.getText());
@@ -172,25 +169,23 @@ public class ConfigureConn {
     }
 
 
-    private boolean checkInputCorrect() {
+    private boolean checkInputUnCorrect() {
         if (hostName.getText().isEmpty()) {
             ShowBox.showError(new TranslationTextComponent("error.input.notentered", new TranslationTextComponent("hostname")));
-            return false;
+            return true;
         }
         if (port.getText().isEmpty()) {
             ShowBox.showError(new TranslationTextComponent("error.input.notentered", new TranslationTextComponent("port")));
-            return false;
+            return true;
         }
         if (userName.getText().isEmpty()) {
             ShowBox.showError(new TranslationTextComponent("error.input.notentered", new TranslationTextComponent("username")));
-            return false;
+            return true;
         }
         if (password.getText().isEmpty()) {
             ShowBox.showError(new TranslationTextComponent("error.input.notentered", new TranslationTextComponent("password")));
-            return false;
+            return true;
         }
-
-
-        return true;
+        return false;
     }
 }

@@ -10,7 +10,7 @@ public class JsonException extends Exception {
     public JsonException(String message, int index) {
         super(
                 new TranslationTextComponent(message).toString() + ' ' +
-                        new TranslationTextComponent("in_index").toString()  +
+                        new TranslationTextComponent("in_index") +
                         " \"" + index + '\"'
         );
     }

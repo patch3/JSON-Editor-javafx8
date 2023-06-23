@@ -61,10 +61,6 @@ public class UnitJson extends AbstractElementJson {
         return this.name.length() + 2 + i;
     }
 
-    @Override
-    public Object getValue() {
-        return super.getValue();
-    }
 
 
     @Override

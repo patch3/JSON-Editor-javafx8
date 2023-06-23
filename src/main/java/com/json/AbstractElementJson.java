@@ -17,7 +17,7 @@ public abstract class AbstractElementJson implements IUnitJson {
 
     protected TypeValue typeValue;
 
-    protected int id;
+    protected final int id;
 
     public AbstractElementJson(TypeUnit type) {
         this.id = countId++;
@@ -114,8 +114,7 @@ public abstract class AbstractElementJson implements IUnitJson {
     }
 
     @Override
-    public void setValue(Object value, TypeValue typeValue) throws JsonException {
-
+    public void setValue(Object value, TypeValue typeValue) {
         this.value = value;
         this.typeValue = typeValue;
     }

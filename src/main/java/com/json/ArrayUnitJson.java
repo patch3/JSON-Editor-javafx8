@@ -46,11 +46,6 @@ public class ArrayUnitJson extends AbstractElementJson {
 
 
     @Override
-    public int hashCode() {
-        return Objects.hash(value, typeValue, id);
-    }
-
-    @Override
     public String getName() {
         return String.format("[%d]", this.index);
     }
@@ -62,11 +57,6 @@ public class ArrayUnitJson extends AbstractElementJson {
         } else {
             throw new IllegalArgumentException("Ожидался index");
         }
-    }
-
-    @Override
-    public TypeUnit getTypeUnit() {
-        return super.TYPE_UNIT;
     }
 
 }
